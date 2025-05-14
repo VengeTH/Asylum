@@ -6,6 +6,9 @@ TagManager:
   tags:
   - CinemachineTarget
   - Orb
+  - Ramp
+  - Walkable
+  - Unwalkable
   layers:
   - Default
   - TransparentFX
@@ -13,7 +16,7 @@ TagManager:
   - Orb
   - Water
   - UI
-  - 
+  - Unwalkable
   - 
   - 
   - 

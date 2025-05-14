@@ -10,14 +10,15 @@ public class OrbManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        enemies = FindObjectsOfType<EnemyAI>();
+        enemies = FindObjectsByType<EnemyAI>(FindObjectsSortMode.None);
     }
 
     public void ActivateHunterMode(float duration)
     {
         foreach (EnemyAI enemy in enemies)
         {
-            enemy.SetVulnerable(true);
+            if (enemy != null)
+                enemy.SetVulnerable(true);
         }
 
         Invoke("DeactivateHunterMode", duration);
@@ -27,7 +28,8 @@ public class OrbManager : MonoBehaviour
     {
         foreach (EnemyAI enemy in enemies)
         {
-            enemy.SetVulnerable(false);
+            if (enemy != null)
+                enemy.SetVulnerable(false);
         }
     }
 }

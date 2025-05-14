@@ -46,30 +46,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ActivateHunterMode()
-    {
-        Debug.Log("Activated Hunter Mode!");
-
-        // Switch cameras
-        if (firstPersonCam != null) firstPersonCam.gameObject.SetActive(false);
-        if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(true);
-
-        // Optional: Change character appearance
-        if (player.TryGetComponent<Renderer>(out Renderer renderer))
-        {
-            renderer.material.color = Color.red;
-        }
-
-        // Notify enemies to enter vulnerable state
-        foreach (EnemyAI enemy in FindObjectsOfType<EnemyAI>())
-        {
-            enemy.SetVulnerable(true);
-        }
-
-        // Start timer to revert back
-        StartCoroutine(DeactivateHunterModeAfterDelay(hunterDuration));
-    }
-
     IEnumerator DeactivateHunterModeAfterDelay(float duration)
     {
         yield return new WaitForSeconds(duration);

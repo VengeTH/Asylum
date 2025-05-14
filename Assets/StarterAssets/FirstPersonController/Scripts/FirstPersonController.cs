@@ -51,6 +51,18 @@ namespace StarterAssets
 		[Tooltip("How far in degrees can you move the camera down")]
 		public float BottomClamp = -90.0f;
 
+		[Header("Camera Options")]
+		[Tooltip("Invert the vertical camera rotation")]
+		public bool InvertY = true;
+		[Tooltip("Sensitivity multiplier for camera movement")]
+		public float CameraSensitivity = 1.0f;
+
+		[Header("Direct Camera Control")]
+		[Tooltip("Bypass Cinemachine and control the camera directly")]
+		public bool bypassCinemachine = false;
+		[Tooltip("Camera transform to control directly")]
+		public Transform directCameraTransform;
+
 		// cinemachine
 		private float _cinemachineTargetPitch;
 
@@ -64,7 +76,6 @@ namespace StarterAssets
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
-	
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -108,6 +119,24 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+
+			// Set up direct camera control if enabled
+			if (bypassCinemachine && directCameraTransform == null)
+			{
+				Camera mainCamera = Camera.main;
+				if (mainCamera != null)
+				{
+					directCameraTransform = mainCamera.transform;
+				}
+			}
+
+			// Initialize camera pitch
+			if (CinemachineCameraTarget != null)
+			{
+				_cinemachineTargetPitch = CinemachineCameraTarget.transform.localRotation.eulerAngles.x;
+				if (_cinemachineTargetPitch > 180)
+					_cinemachineTargetPitch -= 360;
+			}
 		}
 
 		private void Update()
@@ -122,33 +151,62 @@ namespace StarterAssets
 			CameraRotation();
 		}
 
-		private void GroundedCheck()
-		{
-			// set sphere position, with offset
-			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-		}
-
 		private void CameraRotation()
 		{
 			// if there is an input
 			if (_input.look.sqrMagnitude >= _threshold)
 			{
-				//Don't multiply mouse input by Time.deltaTime
+				// Calculate the multiplier based on device and settings
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+				float sensitivityMultiplier = CameraSensitivity;
 
-				// clamp our pitch rotation
+				// Apply rotation for X axis (horizontal) - unchanged
+				float lookX = _input.look.x * RotationSpeed * deltaTimeMultiplier * sensitivityMultiplier;
+				_rotationVelocity = lookX;
+
+				// Handle Y input (vertical) with proper inversion
+				float lookY = _input.look.y * RotationSpeed * deltaTimeMultiplier * sensitivityMultiplier;
+
+				// Apply inversion based on setting
+				if (InvertY)
+				{
+					// Keep the existing behavior if inverted
+					_cinemachineTargetPitch += lookY;
+				}
+				else
+				{
+					// Invert the sign for non-inverted controls
+					_cinemachineTargetPitch -= lookY;
+				}
+
+				// Clamp our pitch rotation
 				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
 
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+				// Create rotation as a Quaternion
+				Quaternion pitchRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
 
-				// rotate the player left and right
+				// Apply rotation based on mode
+				if (bypassCinemachine && directCameraTransform != null)
+				{
+					// Apply pitch directly to the camera transform
+					directCameraTransform.localRotation = pitchRotation;
+				}
+				else if (CinemachineCameraTarget != null)
+				{
+					// Apply the standard way using Cinemachine target
+					CinemachineCameraTarget.transform.localRotation = pitchRotation;
+				}
+
+				// Rotate the player left and right (horizontal rotation)
 				transform.Rotate(Vector3.up * _rotationVelocity);
 			}
+		}
+
+		private void GroundedCheck()
+		{
+			// set sphere position, with offset
+			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 
 		private void Move()
@@ -264,7 +322,5 @@ namespace StarterAssets
 			// when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
 			Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
 		}
-
-		
 	}
 }

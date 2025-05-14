@@ -2,41 +2,47 @@ using UnityEngine;
 
 public class OrbInteractable : MonoBehaviour
 {
-    public float hunterDuration = 10f;
-    public GameObject interactionPrompt; // Assign your "E to Collect" UI here
-    public float interactionDistance = 2f; // Distance in units to trigger prompt
+    public float interactionDistance = 2f;
+    public GameObject interactionPrompt; // Assign your "E to Collect" Text here
 
-    private Transform playerTransform; // Reference to the player's transform
+    private Transform playerTransform;
     private bool isPlayerNearby = false;
 
     void Start()
     {
-        // Get reference to the player's transform
-        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        // Find the player once at start
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        if (playerTransform == null)
+        {
+            Debug.LogError("Player not found! Make sure it has tag 'Player'");
+        }
+
+        if (interactionPrompt == null)
+        {
+            Debug.LogWarning("Interaction Prompt not assigned on orb: " + name);
+        }
     }
 
     void Update()
     {
-        // Check if the player is within the interaction distance
+        if (playerTransform == null)
+            return;
+
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        if (distanceToPlayer <= interactionDistance)
+
+        if (distanceToPlayer <= interactionDistance && !isPlayerNearby)
         {
-            if (!isPlayerNearby)
-            {
-                interactionPrompt.SetActive(true);
-                isPlayerNearby = true;
-            }
+            interactionPrompt.SetActive(true);
+            isPlayerNearby = true;
         }
-        else
+        else if (distanceToPlayer > interactionDistance && isPlayerNearby)
         {
-            if (isPlayerNearby)
-            {
-                interactionPrompt.SetActive(false);
-                isPlayerNearby = false;
-            }
+            interactionPrompt.SetActive(false);
+            isPlayerNearby = false;
         }
 
-        // Collect the orb if E is pressed while nearby
+        // Only check input if nearby
         if (isPlayerNearby && Input.GetKeyDown(KeyCode.E))
         {
             Collect();
@@ -45,12 +51,17 @@ public class OrbInteractable : MonoBehaviour
 
     void Collect()
     {
-        // Notify the GameManager that an orb was collected
-        GameManager.instance.CollectOrb();
+        // Notify GameManager
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.CollectOrb();
+        }
+        else
+        {
+            Debug.LogError("GameManager not found!");
+        }
 
         // Destroy the orb
         Destroy(gameObject);
-
-        // Optional: Play sound effect or particle effect
     }
 }

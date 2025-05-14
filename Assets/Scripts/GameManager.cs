@@ -5,23 +5,19 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    [Header("Orb Settings")]
     public int collectedOrbs = 0;
     public int orbsRequiredForTransformation = 5;
     public float hunterDuration = 10f;
 
+    [Header("Camera References")]
     public Camera firstPersonCam;
     public Camera thirdPersonCam;
-    private GameObject player;
 
-    public GameObject normalModel;
-    public GameObject hunterModel;
+    [Header("Player References")]
+    public GameObject player;
 
-    void ActivateHunterMode(){
-        normalModel.SetActive(false);
-        hunterModel.SetActive(true);
-    }
-
-    void Awake()
+    private void Awake()
     {
         if (instance == null)
         {
@@ -32,20 +28,61 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        player = GameObject.FindGameObjectWithTag("Player");
+
+        // Optional: Find cameras by name if not assigned
+        if (firstPersonCam == null)
+            firstPersonCam = GameObject.Find("Camera_FirstPerson")?.GetComponent<Camera>();
+        if (thirdPersonCam == null)
+            thirdPersonCam = GameObject.Find("Camera_ThirdPerson")?.GetComponent<Camera>();
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player");
     }
 
+    /// <summary>
+    /// Call this when an orb is collected
+    /// </summary>
     public void CollectOrb()
     {
         collectedOrbs++;
         Debug.Log($"Collected Orbs: {collectedOrbs}");
 
-        if (collectedOrbs == orbsRequiredForTransformation)
+        if (collectedOrbs >= orbsRequiredForTransformation)
         {
             ActivateHunterMode();
         }
     }
 
+    /// <summary>
+    /// Activates Hunter Mode
+    /// </summary>
+    public void ActivateHunterMode()
+    {
+        Debug.Log("🔥 Hunter Mode Activated!");
+
+        // Switch Cameras
+        if (firstPersonCam != null) firstPersonCam.gameObject.SetActive(false);
+        if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(true);
+
+        // Optional: Change character appearance
+        if (player.TryGetComponent<Renderer>(out Renderer renderer))
+        {
+            renderer.material.color = Color.red; // Change to red or any predator look
+        }
+
+        // Notify enemies to enter vulnerable state
+        EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
+        foreach (EnemyAI enemy in enemies)
+        {
+            enemy.SetVulnerable(true);
+        }
+
+        // Start timer to revert back
+        StartCoroutine(DeactivateHunterModeAfterDelay(hunterDuration));
+    }
+
+    /// <summary>
+    /// Deactivates Hunter Mode after time runs out
+    /// </summary>
     IEnumerator DeactivateHunterModeAfterDelay(float duration)
     {
         yield return new WaitForSeconds(duration);
@@ -61,9 +98,29 @@ public class GameManager : MonoBehaviour
         }
 
         // Enemies go back to normal behavior
-        foreach (EnemyAI enemy in FindObjectsOfType<EnemyAI>())
+        EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
+        foreach (EnemyAI enemy in enemies)
         {
             enemy.SetVulnerable(false);
+        }
+
+        Debug.Log("🛡️ Hunter Mode Ended!");
+    }
+
+    /// <summary>
+    /// Changes the number of orbs needed to activate Hunter Mode
+    /// </summary>
+    /// <param name="newRequirement">The new number of orbs required</param>
+    public void SetOrbsRequiredForTransformation(int newRequirement)
+    {
+        if (newRequirement > 0)
+        {
+            orbsRequiredForTransformation = newRequirement;
+            Debug.Log($"Orbs required for transformation set to: {newRequirement}");
+        }
+        else
+        {
+            Debug.LogWarning("Orb requirement must be greater than 0.");
         }
     }
 }

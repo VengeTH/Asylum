@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     public GameObject player;
 
     private EnemyAI[] cachedEnemies;
+    private bool isTransformed = false;  // New flag to track transformation state
+    private Coroutine hunterModeCoroutine; // To store the coroutine reference
 
     private void Awake()
     {
@@ -45,6 +47,17 @@ public class GameManager : MonoBehaviour
     {
         // Cache enemies at start
         RefreshEnemiesCache();
+
+        // Set initial camera state
+        if (firstPersonCam != null && thirdPersonCam != null)
+        {
+            firstPersonCam.enabled = true;
+            thirdPersonCam.enabled = false;
+        }
+        else
+        {
+            Debug.LogError("Camera references not set in GameManager!");
+        }
     }
 
     private void RefreshEnemiesCache()
@@ -60,8 +73,10 @@ public class GameManager : MonoBehaviour
         collectedOrbs++;
         Debug.Log($"Collected Orbs: {collectedOrbs}");
 
-        if (collectedOrbs >= orbsRequiredForTransformation)
+        // Only transform if we haven't transformed yet and have enough orbs
+        if (!isTransformed && collectedOrbs >= orbsRequiredForTransformation)
         {
+            isTransformed = true;  // Set the flag
             ActivateHunterMode();
         }
     }
@@ -73,54 +88,62 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("🔥 Hunter Mode Activated!");
 
-        // Switch Cameras
-        if (firstPersonCam != null) firstPersonCam.gameObject.SetActive(false);
-        if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(true);
-
-        // Optional: Change character appearance
-        if (player != null && player.TryGetComponent<Renderer>(out Renderer renderer))
+        // Switch to third person camera
+        if (firstPersonCam != null && thirdPersonCam != null)
         {
-            renderer.material.color = Color.red; // Change to red or any predator look
+            firstPersonCam.enabled = false;
+            thirdPersonCam.enabled = true;
+            Debug.Log("Switched to third person camera");
         }
 
-        // Refresh enemies cache and notify them to enter vulnerable state
-        RefreshEnemiesCache();
+        // Make enemies vulnerable
         foreach (EnemyAI enemy in cachedEnemies)
         {
             if (enemy != null)
                 enemy.SetVulnerable(true);
         }
 
-        // Start timer to revert back
-        StartCoroutine(DeactivateHunterModeAfterDelay(hunterDuration));
-    }
-
-    /// <summary>
-    /// Deactivates Hunter Mode after time runs out
-    /// </summary>
-    IEnumerator DeactivateHunterModeAfterDelay(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-
-        // Revert camera
-        if (firstPersonCam != null) firstPersonCam.gameObject.SetActive(true);
-        if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(false);
-
-        // Revert color
-        if (player != null && player.TryGetComponent<Renderer>(out Renderer renderer))
+        // If there's an existing coroutine, stop it
+        if (hunterModeCoroutine != null)
         {
-            renderer.material.color = Color.white;
+            StopCoroutine(hunterModeCoroutine);
         }
 
-        // Refresh enemies cache and revert their behavior
-        RefreshEnemiesCache();
+        // Start the timer to deactivate hunter mode
+        hunterModeCoroutine = StartCoroutine(DeactivateHunterModeAfterDelay());
+    }
+
+    private IEnumerator DeactivateHunterModeAfterDelay()
+    {
+        yield return new WaitForSeconds(hunterDuration);
+        DeactivateHunterMode();
+    }
+
+    private void DeactivateHunterMode()
+    {
+        Debug.Log("Hunter Mode Deactivated!");
+
+        // Switch back to first person camera
+        if (firstPersonCam != null && thirdPersonCam != null)
+        {
+            firstPersonCam.enabled = true;
+            thirdPersonCam.enabled = false;
+            Debug.Log("Switched back to first person camera");
+        }
+
+        // Make enemies invulnerable again
         foreach (EnemyAI enemy in cachedEnemies)
         {
             if (enemy != null)
                 enemy.SetVulnerable(false);
         }
 
-        Debug.Log("🛡️ Hunter Mode Ended!");
+        // Reset the coroutine reference
+        hunterModeCoroutine = null;
+
+        // Optional: Allow player to transform again
+        isTransformed = false;
+        collectedOrbs = 0; // Optional: Reset orb count
     }
 
     /// <summary>
@@ -137,6 +160,28 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogWarning("Orb requirement must be greater than 0.");
+        }
+    }
+
+    private void SwitchToThirdPerson()
+    {
+        if (firstPersonCam != null && thirdPersonCam != null)
+        {
+            firstPersonCam.enabled = false;
+            thirdPersonCam.enabled = true;
+            Debug.Log("Switched to third person camera");
+        }
+    }
+
+    // Optional: Method to reset the game state if needed
+    public void ResetGameState()
+    {
+        isTransformed = false;
+        collectedOrbs = 0;
+        if (hunterModeCoroutine != null)
+        {
+            StopCoroutine(hunterModeCoroutine);
+            DeactivateHunterMode();
         }
     }
 }

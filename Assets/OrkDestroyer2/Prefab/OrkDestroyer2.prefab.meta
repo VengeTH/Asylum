@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d31d29bd659534649b718966cbf37289
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 126970
+  packageName: Ork Destroyer 2
+  packageVersion: 1.0
+  assetPath: Assets/OrkDestroyer2/Prefab/OrkDestroyer2.prefab
+  uploadId: 263285

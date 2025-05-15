@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7a144a95b9ad0284cbbc909f503cd31b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 126970
+  packageName: Ork Destroyer 2
+  packageVersion: 1.0
+  assetPath: Assets/OrkDestroyer2/Materials/Body.mat
+  uploadId: 263285

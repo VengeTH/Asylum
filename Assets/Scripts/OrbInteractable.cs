@@ -61,6 +61,10 @@ public class OrbInteractable : MonoBehaviour
             Debug.LogError("GameManager not found!");
         }
 
+        // Hide the prompt
+        if (interactionPrompt != null)
+            interactionPrompt.SetActive(false);
+
         // Destroy the orb
         Destroy(gameObject);
     }

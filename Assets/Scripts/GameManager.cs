@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     [Header("Player References")]
     public GameObject player;
 
+    private EnemyAI[] cachedEnemies;
+
     private void Awake()
     {
         if (instance == null)
@@ -27,6 +29,7 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
 
         // Optional: Find cameras by name if not assigned
@@ -36,6 +39,17 @@ public class GameManager : MonoBehaviour
             thirdPersonCam = GameObject.Find("Camera_ThirdPerson")?.GetComponent<Camera>();
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player");
+    }
+
+    private void Start()
+    {
+        // Cache enemies at start
+        RefreshEnemiesCache();
+    }
+
+    private void RefreshEnemiesCache()
+    {
+        cachedEnemies = FindObjectsByType<EnemyAI>(FindObjectsSortMode.None);
     }
 
     /// <summary>
@@ -64,16 +78,17 @@ public class GameManager : MonoBehaviour
         if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(true);
 
         // Optional: Change character appearance
-        if (player.TryGetComponent<Renderer>(out Renderer renderer))
+        if (player != null && player.TryGetComponent<Renderer>(out Renderer renderer))
         {
             renderer.material.color = Color.red; // Change to red or any predator look
         }
 
-        // Notify enemies to enter vulnerable state
-        EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
-        foreach (EnemyAI enemy in enemies)
+        // Refresh enemies cache and notify them to enter vulnerable state
+        RefreshEnemiesCache();
+        foreach (EnemyAI enemy in cachedEnemies)
         {
-            enemy.SetVulnerable(true);
+            if (enemy != null)
+                enemy.SetVulnerable(true);
         }
 
         // Start timer to revert back
@@ -92,16 +107,17 @@ public class GameManager : MonoBehaviour
         if (thirdPersonCam != null) thirdPersonCam.gameObject.SetActive(false);
 
         // Revert color
-        if (player.TryGetComponent<Renderer>(out Renderer renderer))
+        if (player != null && player.TryGetComponent<Renderer>(out Renderer renderer))
         {
             renderer.material.color = Color.white;
         }
 
-        // Enemies go back to normal behavior
-        EnemyAI[] enemies = FindObjectsOfType<EnemyAI>();
-        foreach (EnemyAI enemy in enemies)
+        // Refresh enemies cache and revert their behavior
+        RefreshEnemiesCache();
+        foreach (EnemyAI enemy in cachedEnemies)
         {
-            enemy.SetVulnerable(false);
+            if (enemy != null)
+                enemy.SetVulnerable(false);
         }
 
         Debug.Log("🛡️ Hunter Mode Ended!");

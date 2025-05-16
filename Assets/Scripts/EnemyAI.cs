@@ -205,7 +205,7 @@ public class EnemyAI : MonoBehaviour
         if (agent != null)
         {
             // Move faster when escaping
-            agent.speed = state ? speed * 1.5f : speed;
+            agent.speed = state ? speed * 5f : speed;
             // Adjust stopping distance based on state
             agent.stoppingDistance = attackRange * (state ? 1.2f : 0.8f);
         }

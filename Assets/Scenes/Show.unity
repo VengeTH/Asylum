@@ -2217,6 +2217,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0.008
       objectReference: {fileID: 0}
+    - target: {fileID: 5393215578589016654, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 5393215578589016655, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 215fc7c8e2d87c8438088b27a1600878, type: 2}
     - target: {fileID: 8616685848737228371, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: Gravity
       value: -13
@@ -3750,8 +3758,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
-  isInvulnerable: 0
-  invulnerabilityDuration: 20
   onDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -6604,7 +6610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 63711976}
-  speed: 9
+  speed: 3
   maxEscapeDistance: 20
   minSafeDistance: 8
   pathUpdateInterval: 0.5
@@ -6613,6 +6619,10 @@ MonoBehaviour:
   hunterModeAttackDamage: 10
   attackCooldown: 5
   attackAnimationDuration: 0.5
+  roamingDistanceThreshold: 10
+  roamPointRange: 20
+  roamNewDestinationInterval: 5
+  doorWaitTime: 10
 --- !u!54 &1602957841
 Rigidbody:
   m_ObjectHideFlags: 0

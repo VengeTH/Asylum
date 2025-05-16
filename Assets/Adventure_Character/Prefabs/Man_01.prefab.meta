@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ebc4580c7ed532b4cb07171aed640d52
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201384
+  packageName: Adventure Character
+  packageVersion: 1.0
+  assetPath: Assets/Adventure_Character/Prefabs/Man_01.prefab
+  uploadId: 448636

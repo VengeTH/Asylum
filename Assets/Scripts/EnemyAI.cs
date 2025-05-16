@@ -28,7 +28,24 @@ public class EnemyAI : MonoBehaviour
     [Tooltip("Duration of the attack animation")]
     public float attackAnimationDuration = 0.5f;
 
+    [Header("Roaming Settings")]
+    [Tooltip("Distance at which the enemy stops following the player and starts roaming.")]
+    public float roamingDistanceThreshold = 10f;
+    [Tooltip("The range within which to pick a random roam point from the current position.")]
+    public float roamPointRange = 20f;
+    [Tooltip("How often to pick a new roam destination (seconds) if stuck or idle.")]
+    public float roamNewDestinationInterval = 5f;
+
+    [Header("Door Interaction")]
+    [Tooltip("Time in seconds the enemy waits at a closed door.")]
+    public float doorWaitTime = 10f;
+
     private bool isVulnerable;
+    private bool isRoaming = false;
+    private float nextRoamDestinationTime;
+    private Vector3 currentRoamTarget;
+    private bool isWaitingForDoor = false;
+    private Coroutine doorWaitCoroutine;
     private NavMeshAgent agent;
     private Animator animator;
     private float nextPathUpdate;
@@ -82,8 +99,15 @@ public class EnemyAI : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
+        if (isWaitingForDoor) // If waiting for a door, do nothing else related to movement
+        {
+            if (agent.velocity.magnitude > 0.1f && agent.hasPath) agent.ResetPath(); // Stop if somehow moving
+            if (animator) animator.SetBool("Walk", false);
+            return;
+        }
+
         // Check if we can attack
-        if (distanceToPlayer <= attackRange && Time.time >= nextAttackTime && !isAttacking)
+        if (!isRoaming && distanceToPlayer <= attackRange && Time.time >= nextAttackTime && !isAttacking)
         {
             StartAttack();
         }
@@ -92,24 +116,40 @@ public class EnemyAI : MonoBehaviour
         {
             if (isVulnerable)
             {
-                // Update escape path at intervals
+                isRoaming = false; // Not roaming when vulnerable and escaping
+                // agent.speed is set in SetVulnerable
                 if (Time.time >= nextPathUpdate)
                 {
                     CalculateEscapePath();
                     nextPathUpdate = Time.time + pathUpdateInterval;
                 }
             }
-            else
+            else // Not vulnerable
             {
-                // Chase player when not vulnerable
-                agent.SetDestination(player.position);
+                if (distanceToPlayer >= roamingDistanceThreshold)
+                {
+                    if (!isRoaming) // Transition to roaming
+                    {
+                        isRoaming = true;
+                        nextRoamDestinationTime = Time.time; // Pick a new destination immediately
+                    }
+                    agent.speed = speed * 0.7f; // Set roaming speed
+                    Roam();
+                }
+                else // Chase player
+                {
+                    isRoaming = false;
+                    agent.speed = speed; // Set default chase speed
+                    agent.SetDestination(player.position);
+                    CheckForDoors();
+                }
             }
         }
 
         // Update animation
         if (animator)
         {
-            animator.SetBool("Walk", agent.velocity.magnitude > 0.1f);
+            animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && !isAttacking && !isWaitingForDoor);
         }
     }
 
@@ -141,6 +181,7 @@ public class EnemyAI : MonoBehaviour
     {
         isAttacking = false;
         agent.isStopped = false;
+        Debug.Log($"Enemy {gameObject.name} EndAttack called at {Time.time}"); // Added for debugging
     }
 
     void PerformAttack()
@@ -209,6 +250,96 @@ public class EnemyAI : MonoBehaviour
             // Adjust stopping distance based on state
             agent.stoppingDistance = attackRange * (state ? 1.2f : 0.8f);
         }
+    }
+
+    void Roam()
+    {
+        // If we have a path and are moving towards it, and it's not time for a new one yet
+        if (agent.hasPath && agent.remainingDistance > agent.stoppingDistance && Time.time < nextRoamDestinationTime)
+        {
+            CheckForDoors(); // Check for doors while roaming
+            return;
+        }
+
+        // Time to find a new random destination or current path is invalid/completed
+        Vector3 randomDirection = Random.insideUnitSphere * roamPointRange;
+        randomDirection += transform.position;
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomDirection, out hit, roamPointRange, NavMesh.AllAreas))
+        {
+            currentRoamTarget = hit.position;
+            agent.SetDestination(currentRoamTarget);
+            // Set next roam time with some variability
+            nextRoamDestinationTime = Time.time + roamNewDestinationInterval + Random.Range(-roamNewDestinationInterval * 0.2f, roamNewDestinationInterval * 0.2f);
+            Debug.Log($"Enemy {gameObject.name} new roam target: {currentRoamTarget} (next update in {nextRoamDestinationTime - Time.time:F1}s)");
+            CheckForDoors(); // Check for doors after setting new roam path
+        }
+        else
+        {
+            // If failed to find a point, try again sooner
+            nextRoamDestinationTime = Time.time + 1f; // Try again in 1 second
+            Debug.LogWarning($"Enemy {gameObject.name} failed to find a roam point near {randomDirection}.");
+        }
+    }
+
+    void CheckForDoors()
+    {
+        if (isWaitingForDoor || !agent.hasPath || agent.velocity.sqrMagnitude < 0.01f) return; // Not moving or already waiting
+
+        RaycastHit hitInfo;
+        // Raycast slightly in front and in the direction of movement
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.5f; // Agent's center height
+        Vector3 direction = agent.velocity.normalized;
+        float rayDistance = agent.stoppingDistance + 1.0f; // Check a bit beyond stopping distance
+
+        // Debug.DrawRay(rayOrigin, direction * rayDistance, Color.yellow, 0.1f);
+
+        if (Physics.Raycast(rayOrigin, direction, out hitInfo, rayDistance))
+        {
+            if (hitInfo.collider.CompareTag("Door"))
+            {
+                // A more robust check would be if the agent's path is partially blocked by this door
+                // For simplicity, if we are close to a door and nearly stopped, assume it's blocking.
+                if (Vector3.Distance(transform.position, hitInfo.point) < agent.stoppingDistance + 0.5f && agent.velocity.magnitude < 0.2f)
+                {
+                    Debug.Log($"Enemy {gameObject.name} detected door: {hitInfo.collider.name} while moving towards {agent.destination}. Path status: {agent.pathStatus}");
+                    StartWaitingForDoor(hitInfo.collider.gameObject);
+                }
+            }
+        }
+    }
+
+    void StartWaitingForDoor(GameObject doorObject)
+    {
+        if (isWaitingForDoor) return; // Already waiting
+
+        isWaitingForDoor = true;
+        agent.isStopped = true; 
+        // agent.ResetPath(); // Clearing path might not be desired if we want to resume it
+        Debug.Log($"Enemy {gameObject.name} is waiting for door {doorObject.name} to open for {doorWaitTime} seconds.");
+        if (animator) animator.SetBool("Walk", false); // Stop walk animation
+
+        if (doorWaitCoroutine != null)
+        {
+            StopCoroutine(doorWaitCoroutine);
+        }
+        doorWaitCoroutine = StartCoroutine(WaitForDoorSequence(doorObject));
+    }
+
+    System.Collections.IEnumerator WaitForDoorSequence(GameObject doorObject)
+    {
+        yield return new WaitForSeconds(doorWaitTime);
+
+        Debug.Log($"Enemy {gameObject.name} finished waiting for door {doorObject.name}. Assuming it's open now.");
+        isWaitingForDoor = false;
+        agent.isStopped = false; // Allow agent to move again
+        // The enemy will re-evaluate its state (roam/chase) in the next Update.
+        // If it was chasing, it will try to set destination to player again.
+        // If it was roaming, Roam() will be called and might pick a new point or continue.
+        // To prevent immediate re-triggering if the door didn't "actually" open,
+        // a more complex system (e.g. ignoring this door for a bit) would be needed.
+        doorWaitCoroutine = null;
+        nextRoamDestinationTime = Time.time; // Force re-evaluation of roam path if roaming
     }
 
     // Optional: Visualize attack range in editor

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bad921bf5cea1f04687b3f7577ac9d34
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201384
+  packageName: Adventure Character
+  packageVersion: 1.0
+  assetPath: Assets/Adventure_Character/Materials/Man_Cloth_Down_02.mat
+  uploadId: 448636

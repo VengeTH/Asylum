@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6cc77a6303488d84aadaf60ef4023104
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201384
+  packageName: Adventure Character
+  packageVersion: 1.0
+  assetPath: Assets/Adventure_Character/Materials/Stand.mat
+  uploadId: 448636

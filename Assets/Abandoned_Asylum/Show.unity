@@ -469,63 +469,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1291821140}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &210411559
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1302186489207832, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_Name
-      value: OrkDestroyer2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.038
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.959
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -8.178
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4191930812522720, guid: d31d29bd659534649b718966cbf37289, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d31d29bd659534649b718966cbf37289, type: 3}
 --- !u!1 &237884273
 GameObject:
   m_ObjectHideFlags: 0
@@ -3287,6 +3230,11 @@ MonoBehaviour:
   target: {fileID: 63711976}
   offset: {x: 0, y: 1.5, z: -3}
   smoothSpeed: 0.125
+  rotationSpeed: 5
+  minVerticalAngle: -30
+  maxVerticalAngle: 60
+  mouseXSensitivity: 2
+  mouseYSensitivity: 1
 --- !u!81 &1096268580
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3696,6 +3644,7 @@ MonoBehaviour:
   collectedOrbs: 0
   orbsRequiredForTransformation: 1
   hunterDuration: 20
+  timerManager: {fileID: 0}
   firstPersonCam: {fileID: 1915320030}
   thirdPersonCam: {fileID: 0}
   player: {fileID: 2097227773}
@@ -4437,6 +4386,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 63711976}
   speed: 3
+  maxEscapeDistance: 15
+  minSafeDistance: 8
+  pathUpdateInterval: 0.5
+  attackRange: 2
+  normalAttackDamage: 20
+  hunterModeAttackDamage: 10
+  attackCooldown: 1.5
+  attackAnimationDuration: 0.5
+  roamingDistanceThreshold: 10
+  roamPointRange: 20
+  roamNewDestinationInterval: 5
+  doorWaitTime: 10
 --- !u!1 &1674408784
 GameObject:
   m_ObjectHideFlags: 0
@@ -5681,4 +5642,3 @@ SceneRoots:
   - {fileID: 527383241}
   - {fileID: 826322422}
   - {fileID: 1096268582}
-  - {fileID: 210411559}

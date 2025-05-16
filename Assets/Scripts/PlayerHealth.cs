@@ -7,8 +7,6 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health Settings")]
     public float maxHealth = 100f;
     public float currentHealth;
-    public bool isInvulnerable = false;
-    public float invulnerabilityDuration = 0.5f;
 
     [Header("Events")]
     public UnityEvent onDeath;
@@ -17,8 +15,6 @@ public class PlayerHealth : MonoBehaviour
     [Header("UI Effects")]
     public CanvasGroup damageFlashCanvas;
     public float flashDuration = 0.2f;
-
-    private float invulnerabilityTimer;
 
     void Awake()
     {
@@ -39,23 +35,8 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log($"Player Health Initialized: {currentHealth}/{maxHealth}");
     }
 
-    void Update()
-    {
-        // Update invulnerability timer
-        if (isInvulnerable && invulnerabilityTimer > 0)
-        {
-            invulnerabilityTimer -= Time.deltaTime;
-            if (invulnerabilityTimer <= 0)
-            {
-                isInvulnerable = false;
-            }
-        }
-    }
-
     public void TakeDamage(float damage)
     {
-        if (isInvulnerable) return;
-
         Debug.Log($"Player taking damage: {damage}");
         float previousHealth = currentHealth;
         currentHealth = Mathf.Max(0, currentHealth - damage);
@@ -74,12 +55,6 @@ public class PlayerHealth : MonoBehaviour
             if (currentHealth <= 0)
             {
                 Die();
-            }
-            else
-            {
-                // Temporary invulnerability
-                isInvulnerable = true;
-                invulnerabilityTimer = invulnerabilityDuration;
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,16 +8,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Orb Settings")]
     public int collectedOrbs = 0;
-    public int orbsRequiredForTransformation = 5;
-    public float hunterDuration = 10f;
+    public int orbsRequiredForTransformation = 1;
+    public float hunterDuration = 20f;
 
-        [Header("Objective Settings")]
-    public int totalObjectivesInScene = 3; // Example: Set this in Inspector or dynamically
+    [Header("Objective Settings")]
+    public int totalObjectivesInScene = 3;
     private int objectivesCollectedCount = 0;
-    public static event System.Action OnGameWon; // Event to signal game win
+    public static event System.Action OnGameWon;
 
-    [Header("Timer Manager")] // Added Header
-    public TimerManager timerManager; // Added TimerManager reference
+    [Header("Timer Manager")]
+    public TimerManager timerManager;
 
     [Header("Camera References")]
     public Camera firstPersonCam;
@@ -26,9 +27,8 @@ public class GameManager : MonoBehaviour
     public GameObject player;
 
     private EnemyAI[] cachedEnemies;
-    private bool isTransformed = false;  // New flag to track transformation state
-    private bool gameWon = false; // Flag to check if game is already won
-    // private Coroutine hunterModeCoroutine; // To store the coroutine reference // REMOVED
+    private bool isTransformed = false;
+    private bool gameWon = false;
 
     private void Awake()
     {
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            ObjectiveCollectible.OnObjectiveCollected += HandleObjectiveCollected; // Subscribe to objective collection
+            ObjectiveCollectible.OnObjectiveCollected += HandleObjectiveCollected;
         }
         else
         {
@@ -44,16 +44,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-
-        // Optional: Find cameras by name if not assigned
-        if (firstPersonCam == null)
-            firstPersonCam = GameObject.Find("Camera_FirstPerson")?.GetComponent<Camera>();
-        if (thirdPersonCam == null)
-            thirdPersonCam = GameObject.Find("Camera_ThirdPerson")?.GetComponent<Camera>();
-        if (player == null)
-            player = GameObject.FindGameObjectWithTag("Player");
-
-        // Get TimerManager instance
+        // Find TimerManager if not assigned
         if (timerManager == null)
         {
             timerManager = FindAnyObjectByType<TimerManager>();
@@ -62,6 +53,14 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("TimerManager not found in the scene!");
             }
         }
+
+        // Optional: Find cameras by name if not assigned
+        if (firstPersonCam == null)
+            firstPersonCam = GameObject.Find("Camera_FirstPerson")?.GetComponent<Camera>();
+        if (thirdPersonCam == null)
+            thirdPersonCam = GameObject.Find("Camera_ThirdPerson")?.GetComponent<Camera>();
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player");
     }
 
     private void Start()
@@ -83,23 +82,22 @@ public class GameManager : MonoBehaviour
         // Subscribe to TimerManager event
         if (timerManager != null)
         {
-            TimerManager.OnHunterModeTimerEnd += DeactivateHunterMode; // Subscribe
+            TimerManager.OnHunterModeTimerEnd += DeactivateHunterMode;
         }
     }
 
-    private void OnDestroy() // Added OnDestroy
+    private void OnDestroy()
     {
-        // Unsubscribe from TimerManager event to prevent memory leaks
-        if (timerManager != null) // Check if timerManager was found/assigned
+        if (timerManager != null)
         {
-            TimerManager.OnHunterModeTimerEnd -= DeactivateHunterMode; // Unsubscribe
+            TimerManager.OnHunterModeTimerEnd -= DeactivateHunterMode;
         }
-        ObjectiveCollectible.OnObjectiveCollected -= HandleObjectiveCollected; // Unsubscribe from objective collection
+        ObjectiveCollectible.OnObjectiveCollected -= HandleObjectiveCollected;
     }
 
     private void HandleObjectiveCollected()
     {
-        if (gameWon) return; // Don't process if game is already won
+        if (gameWon) return;
 
         objectivesCollectedCount++;
         Debug.Log($"Objective collected! Total collected: {objectivesCollectedCount}/{totalObjectivesInScene}");
@@ -114,8 +112,7 @@ public class GameManager : MonoBehaviour
             gameWon = true;
             Debug.Log("🎉 All objectives collected! YOU WIN! 🎉");
             OnGameWon?.Invoke();
-            // Add any game win logic here (e.g., load win screen, disable player input, etc.)
-            // Time.timeScale = 0; // Example: Pause the game
+            SceneManager.LoadScene("Win");
         }
     }
 
@@ -124,45 +121,34 @@ public class GameManager : MonoBehaviour
         cachedEnemies = FindObjectsByType<EnemyAI>(FindObjectsSortMode.None);
     }
 
-    /// <summary>
-    /// Call this when an orb is collected
-    /// </summary>
     public void CollectOrb()
     {
         collectedOrbs++;
         Debug.Log($"Collected Orbs: {collectedOrbs}");
 
-        // Only transform if we haven't transformed yet and have enough orbs
         if (!isTransformed && collectedOrbs >= orbsRequiredForTransformation)
         {
-            isTransformed = true;  // Set the flag
+            isTransformed = true;
             ActivateHunterMode();
         }
     }
 
-    /// <summary>
-    /// Activates Hunter Mode
-    /// </summary>
     public void ActivateHunterMode()
     {
         Debug.Log("🔥 Hunter Mode Activated!");
 
-        // Switch to third person camera
         if (firstPersonCam != null && thirdPersonCam != null)
         {
             firstPersonCam.enabled = false;
             thirdPersonCam.enabled = true;
-            Debug.Log("Switched to third person camera");
         }
 
-        // Make enemies vulnerable
         foreach (EnemyAI enemy in cachedEnemies)
         {
             if (enemy != null)
                 enemy.SetVulnerable(true);
         }
 
-        // Start the timer using TimerManager
         if (timerManager != null)
         {
             timerManager.StartHunterModeTimer(hunterDuration);
@@ -170,50 +156,25 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogError("TimerManager reference is not set in GameManager. Cannot start hunter mode timer.");
-            // Fallback or error handling if TimerManager is missing, though Awake should have caught this.
         }
-
-        // If there's an existing coroutine, stop it // REMOVED
-        // if (hunterModeCoroutine != null) // REMOVED
-        // { // REMOVED
-        // StopCoroutine(hunterModeCoroutine); // REMOVED
-        // } // REMOVED
-
-        // Start the timer to deactivate hunter mode // REMOVED
-        // hunterModeCoroutine = StartCoroutine(DeactivateHunterModeAfterDelay()); // REMOVED
     }
 
-    // private IEnumerator DeactivateHunterModeAfterDelay() // REMOVED
-    // { // REMOVED
-    //     yield return new WaitForSeconds(hunterDuration); // REMOVED
-    //     DeactivateHunterMode(); // REMOVED
-    // } // REMOVED
-
-    private void DeactivateHunterMode() // Made public to be accessible by event, or keep private if event is static
+    private void DeactivateHunterMode()
     {
-        Debug.Log("Hunter Mode Deactivated!");
+        isTransformed = false;
+        collectedOrbs = 0;
 
-        // Switch back to first person camera
         if (firstPersonCam != null && thirdPersonCam != null)
         {
             firstPersonCam.enabled = true;
             thirdPersonCam.enabled = false;
-            Debug.Log("Switched back to first person camera");
         }
 
-        // Make enemies invulnerable again
         foreach (EnemyAI enemy in cachedEnemies)
         {
             if (enemy != null)
                 enemy.SetVulnerable(false);
         }
-
-        // Reset the coroutine reference // REMOVED
-        // hunterModeCoroutine = null; // REMOVED
-
-        // Optional: Allow player to transform again
-        isTransformed = false;
-        collectedOrbs = 0; // Optional: Reset orb count
     }
 
     /// <summary>
@@ -248,18 +209,9 @@ public class GameManager : MonoBehaviour
     {
         isTransformed = false;
         collectedOrbs = 0;
-        // if (hunterModeCoroutine != null) // REMOVED
-        // { // REMOVED
-        //     StopCoroutine(hunterModeCoroutine); // REMOVED
-        //     DeactivateHunterMode(); // Call directly if needed, or rely on timer to end
-        // } // REMOVED
-        // If a timer is running, you might want to stop it via TimerManager
-        // For now, DeactivateHunterMode will be called by the timer's event if it was running.
-        // If you need an immediate stop, you'd add a StopHunterModeTimer to TimerManager and call it here.
-        // For simplicity, we'll assume the natural end of the timer or a new game start handles this.
-        if (isTransformed) // If hunter mode was active, ensure it's properly deactivated
+        if (isTransformed)
         {
-             DeactivateHunterMode(); // Manually call to reset state if ResetGameState is called mid-hunter mode
+            DeactivateHunterMode();
         }
     }
 }

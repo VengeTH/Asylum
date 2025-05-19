@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -70,13 +71,14 @@ public class PlayerHealth : MonoBehaviour
     {
         Debug.Log("Player died!");
         onDeath?.Invoke();
-        // You can add additional death logic here
+        // Load lose scene when player dies
+        SceneManager.LoadScene("Lose");
     }
 
     public void Heal(float amount)
     {
         float previousHealth = currentHealth;
-        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
 
         if (currentHealth != previousHealth)
         {

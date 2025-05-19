@@ -78,31 +78,22 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (!enabled || player == null) return;
+        if (player == null || !agent.isOnNavMesh || !agent.isActiveAndEnabled) return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        // Check if we can attack
-        if (distanceToPlayer <= attackRange && Time.time >= nextAttackTime && !isAttacking)
+        // Update path if needed
+        if (Time.time >= nextPathUpdate)
         {
-            StartAttack();
+            CalculateEscapePath();
+            nextPathUpdate = Time.time + pathUpdateInterval;
         }
 
-        if (!isAttacking) // Only move if not attacking
+        // Check if we can attack
+        if (!isAttacking && Time.time >= nextAttackTime)
         {
-            if (isVulnerable)
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer <= attackRange)
             {
-                // Update escape path at intervals
-                if (Time.time >= nextPathUpdate)
-                {
-                    CalculateEscapePath();
-                    nextPathUpdate = Time.time + pathUpdateInterval;
-                }
-            }
-            else
-            {
-                // Chase player when not vulnerable
-                agent.SetDestination(player.position);
+                StartAttack();
             }
         }
 
@@ -113,22 +104,24 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    public void SetVulnerable(bool vulnerable)
+    {
+        isVulnerable = vulnerable;
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.speed = vulnerable ? speed * 0.5f : speed;
+        }
+    }
+
     void StartAttack()
     {
+        if (isAttacking) return;
+
         isAttacking = true;
-        nextAttackTime = Time.time + attackCooldown;
-
-        // Stop movement during attack
-        agent.isStopped = true;
-
-        // Trigger attack animation
-        if (animator)
+        if (agent != null && agent.isOnNavMesh)
         {
-            animator.SetTrigger("Attack");
+            agent.isStopped = true;
         }
-
-        // Look at player
-        transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
 
         // Perform the actual attack
         PerformAttack();
@@ -140,7 +133,11 @@ public class EnemyAI : MonoBehaviour
     void EndAttack()
     {
         isAttacking = false;
-        agent.isStopped = false;
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+        }
+        nextAttackTime = Time.time + attackCooldown;
     }
 
     void PerformAttack()
@@ -159,7 +156,7 @@ public class EnemyAI : MonoBehaviour
 
     void CalculateEscapePath()
     {
-        if (player == null) return;
+        if (player == null || !agent.isOnNavMesh) return;
 
         // Get direction away from player
         Vector3 directionFromPlayer = transform.position - player.position;
@@ -178,36 +175,16 @@ public class EnemyAI : MonoBehaviour
                 float newDistanceToPlayer = Vector3.Distance(hit.position, player.position);
                 float currentDistanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-                if (newDistanceToPlayer > currentDistanceToPlayer && newDistanceToPlayer > minSafeDistance)
+                if (newDistanceToPlayer > currentDistanceToPlayer)
                 {
                     escapePoint = hit.position;
-                    agent.SetDestination(escapePoint);
+                    if (agent != null && agent.isOnNavMesh)
+                    {
+                        agent.SetDestination(escapePoint);
+                    }
                     return;
                 }
             }
-        }
-
-        // If no good escape point found, just move in opposite direction
-        Vector3 fallbackPoint = transform.position + directionFromPlayer.normalized * maxEscapeDistance;
-        NavMeshHit fallbackHit;
-        if (NavMesh.SamplePosition(fallbackPoint, out fallbackHit, maxEscapeDistance, NavMesh.AllAreas))
-        {
-            agent.SetDestination(fallbackHit.position);
-        }
-    }
-
-    public void SetVulnerable(bool state)
-    {
-        isVulnerable = state;
-        Debug.Log($"Enemy {gameObject.name} vulnerability set to: {state}");
-
-        // Update agent speed and attack range based on state
-        if (agent != null)
-        {
-            // Move faster when escaping
-            agent.speed = state ? speed * 5f : speed;
-            // Adjust stopping distance based on state
-            agent.stoppingDistance = attackRange * (state ? 1.2f : 0.8f);
         }
     }
 

@@ -1334,6 +1334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Red Gem
+  collectPromptText: {fileID: 0}
 --- !u!65 &381407214
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1733,6 +1734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Lighter
+  collectPromptText: {fileID: 0}
 --- !u!65 &477007776
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2046,6 +2048,7 @@ GameObject:
   - component: {fileID: 527383240}
   - component: {fileID: 527383239}
   - component: {fileID: 527383238}
+  - component: {fileID: 527383242}
   m_Layer: 5
   m_Name: Resources
   m_TagString: Untagged
@@ -2138,6 +2141,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &527383242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527383237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 772b8ff167cf6854e9a9fe915bd3d48c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainTimerText: {fileID: 651617429}
+  mainGameDurationMinutes: 15
+  hunterModeTimerPanel: {fileID: 992939595}
+  panelTimer: {fileID: 992939595}
+  hunterModeTimerText: {fileID: 1966297430}
+  defaultHunterModeDurationSeconds: 60
 --- !u!1 &542302408 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100028, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
@@ -2348,6 +2369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Rusty Key
+  collectPromptText: {fileID: 0}
 --- !u!65 &551979200
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2545,6 +2567,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       insertIndex: -1
       addedObject: {fileID: 894768239}
+    - targetCorrespondingSourceObject: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 894768245}
   m_SourcePrefab: {fileID: 100100000, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
 --- !u!1 &605934731
 GameObject:
@@ -4144,6 +4169,22 @@ MonoBehaviour:
       m_Calls: []
   damageFlashCanvas: {fileID: 0}
   flashDuration: 0.2
+--- !u!114 &894768245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894768233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4ae908f30ed89c4c938a126913e9ee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  horizontalSensitivity: 2
+  verticalSensitivity: 2
+  maxLookAngle: 80
+  invertCamera: 0
 --- !u!1 &898706145
 GameObject:
   m_ObjectHideFlags: 0
@@ -4473,6 +4514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Red ID
+  collectPromptText: {fileID: 0}
 --- !u!65 &933957873
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5048,6 +5090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Valve
+  collectPromptText: {fileID: 0}
 --- !u!65 &1057337494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5569,6 +5612,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Blue USB
+  collectPromptText: {fileID: 0}
 --- !u!65 &1182938114
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5813,7 +5857,7 @@ MonoBehaviour:
   timerManager: {fileID: 1233168621}
   firstPersonCam: {fileID: 1657754698}
   thirdPersonCam: {fileID: 698764774}
-  player: {fileID: 542302408}
+  player: {fileID: 894768233}
 --- !u!1 &1231768449
 GameObject:
   m_ObjectHideFlags: 0
@@ -5895,9 +5939,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainTimerText: {fileID: 651617429}
   mainGameDurationMinutes: 15
-  hunterModeTimerPanel: {fileID: 992939595}
-  hunterModeTimerText: {fileID: 1966297430}
-  defaultHunterModeDurationSeconds: 30
+  hunterModeTimerPanel: {fileID: 0}
+  panelTimer: {fileID: 0}
+  hunterModeTimerText: {fileID: 0}
+  defaultHunterModeDurationSeconds: 60
 --- !u!4 &1233168622
 Transform:
   m_ObjectHideFlags: 0
@@ -6970,6 +7015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Yellow Disk
+  collectPromptText: {fileID: 0}
 --- !u!65 &1432645456
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7259,6 +7305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: White USB
+  collectPromptText: {fileID: 0}
 --- !u!65 &1497941107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8759,6 +8806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Yellow Gem
+  collectPromptText: {fileID: 0}
 --- !u!65 &1904052929
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8861,6 +8909,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Security ID
+  collectPromptText: {fileID: 0}
 --- !u!65 &1913045885
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9169,6 +9218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Green Gem
+  collectPromptText: {fileID: 0}
 --- !u!65 &1983954999
 BoxCollider:
   m_ObjectHideFlags: 0

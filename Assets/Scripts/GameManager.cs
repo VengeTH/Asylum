@@ -10,6 +10,11 @@ public class GameManager : MonoBehaviour
     public int orbsRequiredForTransformation = 5;
     public float hunterDuration = 10f;
 
+        [Header("Objective Settings")]
+    public int totalObjectivesInScene = 3; // Example: Set this in Inspector or dynamically
+    private int objectivesCollectedCount = 0;
+    public static event System.Action OnGameWon; // Event to signal game win
+
     [Header("Timer Manager")] // Added Header
     public TimerManager timerManager; // Added TimerManager reference
 
@@ -22,6 +27,7 @@ public class GameManager : MonoBehaviour
 
     private EnemyAI[] cachedEnemies;
     private bool isTransformed = false;  // New flag to track transformation state
+    private bool gameWon = false; // Flag to check if game is already won
     // private Coroutine hunterModeCoroutine; // To store the coroutine reference // REMOVED
 
     private void Awake()
@@ -30,12 +36,14 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            ObjectiveCollectible.OnObjectiveCollected += HandleObjectiveCollected; // Subscribe to objective collection
         }
         else
         {
             Destroy(gameObject);
             return;
         }
+
 
         // Optional: Find cameras by name if not assigned
         if (firstPersonCam == null)
@@ -85,6 +93,29 @@ public class GameManager : MonoBehaviour
         if (timerManager != null) // Check if timerManager was found/assigned
         {
             TimerManager.OnHunterModeTimerEnd -= DeactivateHunterMode; // Unsubscribe
+        }
+        ObjectiveCollectible.OnObjectiveCollected -= HandleObjectiveCollected; // Unsubscribe from objective collection
+    }
+
+    private void HandleObjectiveCollected()
+    {
+        if (gameWon) return; // Don't process if game is already won
+
+        objectivesCollectedCount++;
+        Debug.Log($"Objective collected! Total collected: {objectivesCollectedCount}/{totalObjectivesInScene}");
+
+        CheckWinCondition();
+    }
+
+    private void CheckWinCondition()
+    {
+        if (objectivesCollectedCount >= totalObjectivesInScene)
+        {
+            gameWon = true;
+            Debug.Log("🎉 All objectives collected! YOU WIN! 🎉");
+            OnGameWon?.Invoke();
+            // Add any game win logic here (e.g., load win screen, disable player input, etc.)
+            // Time.timeScale = 0; // Example: Pause the game
         }
     }
 

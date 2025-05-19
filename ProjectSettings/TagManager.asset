@@ -9,6 +9,7 @@ TagManager:
   - Ramp
   - Walkable
   - Unwalkable
+  - ObjectiveCounterText
   layers:
   - Default
   - TransparentFX

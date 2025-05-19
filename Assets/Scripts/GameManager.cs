@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public float hunterDuration = 20f;
 
     [Header("Objective Settings")]
-    public int totalObjectivesInScene = 3;
+    public int totalObjectivesInScene = 11;
     private int objectivesCollectedCount = 0;
     public static event System.Action OnGameWon;
 

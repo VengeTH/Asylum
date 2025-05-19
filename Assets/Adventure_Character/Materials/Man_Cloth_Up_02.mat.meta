@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1fa5b2a9d37f61244aefcdac8092f401
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201384
+  packageName: Adventure Character
+  packageVersion: 1.0
+  assetPath: Assets/Adventure_Character/Materials/Man_Cloth_Up_02.mat
+  uploadId: 448636

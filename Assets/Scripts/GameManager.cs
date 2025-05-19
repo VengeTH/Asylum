@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         // Get TimerManager instance
         if (timerManager == null)
         {
-            timerManager = FindObjectOfType<TimerManager>();
+            timerManager = FindAnyObjectByType<TimerManager>();
             if (timerManager == null)
             {
                 Debug.LogError("TimerManager not found in the scene!");

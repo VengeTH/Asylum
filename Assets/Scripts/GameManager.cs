@@ -102,6 +102,20 @@ public class GameManager : MonoBehaviour
         objectivesCollectedCount++;
         Debug.Log($"Objective collected! Total collected: {objectivesCollectedCount}/{totalObjectivesInScene}");
 
+        // Check if it's time to trigger enemy aggressive mode
+        if (objectivesCollectedCount > 0 && objectivesCollectedCount % 3 == 0)
+        {
+            Debug.Log($"Objective threshold reached ({objectivesCollectedCount}). Activating aggressive mode for enemies.");
+            RefreshEnemiesCache(); // Ensure the cache is up-to-date, though likely static
+            foreach (EnemyAI enemy in cachedEnemies)
+            {
+                if (enemy != null)
+                {
+                    enemy.ActivateObjectiveBasedAggression();
+                }
+            }
+        }
+
         CheckWinCondition();
     }
 
@@ -146,7 +160,7 @@ public class GameManager : MonoBehaviour
         foreach (EnemyAI enemy in cachedEnemies)
         {
             if (enemy != null)
-                enemy.SetVulnerable(true);
+                enemy.FleeFromOrbAndDeactivateAggression(); // Make enemies flee when hunter mode activates
         }
 
         if (timerManager != null)
@@ -170,11 +184,8 @@ public class GameManager : MonoBehaviour
             thirdPersonCam.enabled = false;
         }
 
-        foreach (EnemyAI enemy in cachedEnemies)
-        {
-            if (enemy != null)
-                enemy.SetVulnerable(false);
-        }
+        // Enemies will naturally return to normal behavior when their flee state times out.
+        // No explicit action needed here to make them 'not vulnerable' anymore.
     }
 
     /// <summary>

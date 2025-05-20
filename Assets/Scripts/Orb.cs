@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour
 {
-    public float hunterDuration = 10f;
+    public float hunterDuration = 15f;
     private OrbManager orbManager;
 
     void Start()
@@ -18,7 +18,7 @@ public class Orb : MonoBehaviour
     {
         if (other.CompareTag("Player") && orbManager != null)
         {
-            orbManager.ActivateHunterMode(hunterDuration);
+            orbManager.PlayerHasCollectedOrb(); // Changed to new method
             Destroy(gameObject);
         }
     }

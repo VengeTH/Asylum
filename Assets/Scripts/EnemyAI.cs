@@ -3,34 +3,40 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
+    private enum EnemyState { Idle, FollowingPlayer, FleeingFromOrb, AggressivePursuit }
+    private EnemyState currentState = EnemyState.Idle;
+
     [Header("References")]
     public Transform player;
 
     [Header("Movement Settings")]
     [Tooltip("Enemy base movement speed")]
     public float speed = 3f;
-    [Tooltip("Distance within which the enemy detects the player")]
-    public float detectionRadius = 20f; // Added detection radius
-    [Tooltip("Maximum escape distance from player")]
+    [Tooltip("Distance within which the enemy detects the player for normal following")]
+    public float detectionRadius = 20f;
+    [Tooltip("Maximum escape distance from player when fleeing an orb")]
     public float maxEscapeDistance = 15f;
-    [Tooltip("Minimum safe distance from player when fleeing")]
-    public float minFleeSafeDistance = 8f; // Renamed for clarity with fleeing
-    [Tooltip("How often to recalculate escape path (seconds)")]
+    [Tooltip("Minimum safe distance from player when fleeing an orb")]
+    public float minFleeSafeDistance = 8f; 
+    [Tooltip("How often to recalculate escape path (seconds) when fleeing")]
     public float pathUpdateInterval = 0.5f;
+    [Tooltip("Duration for fleeing after a normal orb pickup")]
+    public float fleeDuration = 5f;
+    [Tooltip("Speed multiplier when in aggressive pursuit mode")]
+    public float aggressiveModeSpeedMultiplier = 1.5f;
 
     [Header("Attack Settings")]
     [Tooltip("Distance at which enemy can attack")]
     public float attackRange = 2f;
-    [Tooltip("Damage dealt to player when vulnerable")]
-    public float normalAttackDamage = 20f;
-    [Tooltip("Damage dealt to player when in hunter mode")]
-    public float hunterModeAttackDamage = 10f;
+    [Tooltip("Damage dealt to player during normal follow")]
+    public float normalAttackDamage = 10f; // Adjusted for clarity
+    [Tooltip("Damage dealt to player when in aggressive pursuit mode")]
+    public float aggressiveModeAttackDamage = 20f; // Renamed from hunterModeAttackDamage
     [Tooltip("Time between attacks")]
     public float attackCooldown = 1.5f;
     [Tooltip("Duration of the attack animation")]
     public float attackAnimationDuration = 0.5f;
 
-    private bool isVulnerable; // This is set by GameManager to indicate Hunter Mode
     private NavMeshAgent agent;
     private Animator animator;
     private float nextPathUpdate;
@@ -38,14 +44,14 @@ public class EnemyAI : MonoBehaviour
     private float nextAttackTime;
     private bool isAttacking;
     private PlayerHealth playerHealth;
+    private float fleeEndTime;
+    private float originalSpeed; // To store original speed before aggressive mode
 
     void Awake()
     {
-        // Cache components
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
-        // Find player if not assigned
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -60,27 +66,48 @@ public class EnemyAI : MonoBehaviour
             playerHealth = player.GetComponent<PlayerHealth>();
         }
 
-        // Configure NavMeshAgent
         if (agent != null)
         {
-            agent.speed = speed;
+            originalSpeed = speed; // Store original speed
+            agent.speed = originalSpeed;
             agent.stoppingDistance = attackRange * 0.8f;
         }
 
-        // Log setup status
         if (playerHealth == null)
         {
             Debug.LogError($"PlayerHealth component not found for enemy {gameObject.name}!");
         }
         else
         {
-            Debug.Log($"Enemy {gameObject.name} initialized with player reference");
+            Debug.Log($"Enemy {gameObject.name} initialized. Current state: {currentState}");
         }
+    }
+
+    // Called by GameManager when enough objectives are collected
+    public void ActivateObjectiveBasedAggression()
+    {
+        if (isAttacking) EndAttackClean(); // Interrupt any ongoing attack
+
+        currentState = EnemyState.AggressivePursuit;
+        if (agent != null) agent.speed = originalSpeed * aggressiveModeSpeedMultiplier;
+        fleeEndTime = 0; // Ensure not fleeing if switching from fleeing state
+        Debug.Log($"Enemy {gameObject.name}: Aggressive Pursuit activated due to objectives.");
+    }
+
+    // Called by OrbManager when an orb is collected
+    public void FleeFromOrbAndDeactivateAggression()
+    {
+        if (isAttacking) EndAttackClean(); // Interrupt any ongoing attack
+
+        if (agent != null) agent.speed = originalSpeed; // Reset to normal speed, even if was aggressive
+        currentState = EnemyState.FleeingFromOrb;
+        fleeEndTime = Time.time + fleeDuration;
+        Debug.Log($"Enemy {gameObject.name}: Orb collected. Fleeing and deactivating any aggression. Current state: {currentState}");
     }
 
     void Update()
     {
-        if (player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) 
+        if (player == null || agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
         {
             if (animator) animator.SetBool("Walk", false);
             return;
@@ -88,186 +115,151 @@ public class EnemyAI : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > detectionRadius)
+        // Handle FleeingFromOrb state first as it's temporary and overrides others (except new aggressive trigger)
+        if (currentState == EnemyState.FleeingFromOrb)
         {
-            // Player is outside detection radius, enemy should be idle
-            if (agent.hasPath)
+            if (Time.time < fleeEndTime)
             {
-                agent.ResetPath(); // Stop current movement
-            }
-            if (isAttacking) // If was attacking, stop attack sequence
-            {
-                EndAttackClean();
-            }
-            if (animator) animator.SetBool("Walk", false);
-            return; // Do nothing else if player is too far
-        }
-
-        // Player is within detection radius
-        if (isVulnerable) // Hunter mode active (enemy is vulnerable)
-        {
-            // Flee from player
-            if (isAttacking) // If was attacking, stop attack sequence to flee
-            {
-                EndAttackClean();
-            }
-            if (Time.time >= nextPathUpdate)
-            {
-                FleeFromPlayer();
-                nextPathUpdate = Time.time + pathUpdateInterval;
-            }
-        }
-        else
-        {
-            // Normal mode: Follow player and try to attack
-            agent.SetDestination(player.position);
-            agent.isStopped = false; // Ensure agent can move
-
-            if (!isAttacking && Time.time >= nextAttackTime)
-            {
-                if (distanceToPlayer <= attackRange)
+                if (Time.time >= nextPathUpdate) // Recalculate flee path periodically
                 {
-                    StartAttack();
+                    FleeFromPlayer();
+                    nextPathUpdate = Time.time + pathUpdateInterval;
                 }
+                if (animator) animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
+                return; // Prioritize fleeing
+            }
+            else
+            {
+                currentState = EnemyState.Idle; // Fleeing finished, transition to Idle
+                agent.ResetPath();
+                Debug.Log($"Enemy {gameObject.name}: Fleeing finished. Transitioning to Idle.");
             }
         }
 
-        // Update animation based on agent's velocity and if it has a path
-        if (animator)
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+                if (agent.hasPath) agent.ResetPath();
+                if (animator) animator.SetBool("Walk", false);
+                if (distanceToPlayer <= detectionRadius)
+                {
+                    currentState = EnemyState.FollowingPlayer;
+                    Debug.Log($"Enemy {gameObject.name}: Player detected. Transitioning to FollowingPlayer.");
+                }
+                break;
+
+            case EnemyState.FollowingPlayer:
+                if (distanceToPlayer > detectionRadius)
+                {
+                    currentState = EnemyState.Idle;
+                    if (agent.hasPath) agent.ResetPath();
+                    Debug.Log($"Enemy {gameObject.name}: Player lost. Transitioning to Idle.");
+                    break;
+                }
+                agent.SetDestination(player.position);
+                agent.isStopped = isAttacking;
+                if (!isAttacking && Time.time >= nextAttackTime && distanceToPlayer <= attackRange)
+                {
+                    StartAttack(normalAttackDamage);
+                }
+                break;
+
+            case EnemyState.AggressivePursuit:
+                agent.SetDestination(player.position);
+                agent.isStopped = isAttacking;
+                // No detectionRadius check, always pursues
+                if (!isAttacking && Time.time >= nextAttackTime && distanceToPlayer <= attackRange)
+                {
+                    StartAttack(aggressiveModeAttackDamage);
+                }
+                break;
+        }
+
+        if (animator && !isAttacking) // Don't override attack animation with walk
         {
             animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
         }
     }
 
-    public void SetVulnerable(bool vulnerable)
-    {
-        isVulnerable = vulnerable;
-        // Speed adjustment is handled by flee/chase logic or can be general
-        // If hunter mode starts (vulnerable = true), current chase/attack should be interrupted by Update logic
-        // If hunter mode ends (vulnerable = false), Update logic will resume chase if player in range
-        if (agent != null && agent.isOnNavMesh)
-        {
-             // Example: make enemy slower when vulnerable, faster when not, handled by flee/chase logic primarily
-            // agent.speed = vulnerable ? speed * 0.7f : speed; // This might conflict with flee/chase specific speeds
-        }
-        // If becoming vulnerable while attacking, the attack should be interrupted.
-        if (vulnerable && isAttacking)
-        {
-            EndAttackClean(); // Stop the attack to prioritize fleeing
-        }
-    }
-
-    void StartAttack()
+    void StartAttack(float damageAmount)
     {
         if (isAttacking) return;
 
         isAttacking = true;
-        if (agent != null && agent.isOnNavMesh)
-        {
-            agent.isStopped = true;
-        }
-
-        // Perform the actual attack
-        PerformAttack();
-
-        // Reset after animation
+        if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
+        
+        PerformAttack(damageAmount);
         Invoke(nameof(EndAttack), attackAnimationDuration);
     }
 
     void EndAttack()
     {
         isAttacking = false;
-        if (agent != null && agent.isOnNavMesh && !isVulnerable) // Only resume agent if not fleeing
-        {
-            agent.isStopped = false;
-        }
+        if (agent != null && agent.isOnNavMesh) agent.isStopped = false; // Allow movement again
         nextAttackTime = Time.time + attackCooldown;
     }
 
-    // New method to cleanly end attack without setting next attack time, for interruptions
-    void EndAttackClean()
+    void EndAttackClean() // For interruptions
     {
         isAttacking = false;
-        if (agent != null && agent.isOnNavMesh)
-        {
-            agent.isStopped = false; // Allow agent to move (either flee or resume chase if mode changes)
-        }
-        // Do not set nextAttackTime here, as the attack was interrupted
+        CancelInvoke(nameof(EndAttack)); // Stop scheduled EndAttack if interrupted
+        if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
     }
 
-    void PerformAttack()
+    void PerformAttack(float damageAmount)
     {
         if (playerHealth != null)
         {
-            float damage = isVulnerable ? hunterModeAttackDamage : normalAttackDamage;
-            Debug.Log($"Enemy {gameObject.name} attacking player for {damage} damage");
-            playerHealth.TakeDamage(damage);
+            playerHealth.TakeDamage(damageAmount);
+            Debug.Log($"Enemy attacking player for {damageAmount} damage. Current state: {currentState}");
+        }
+        if (animator) animator.SetTrigger("Attack"); // Ensure you have an "Attack" trigger in your Animator
+    }
+
+    void FleeFromPlayer()
+    {
+        if (!agent.isOnNavMesh || player == null) return;
+
+        Vector3 fleeDirection = (transform.position - player.position).normalized;
+        // Ensure fleeDirection is not zero (e.g., if enemy is exactly on player position)
+        if (fleeDirection == Vector3.zero) fleeDirection = Random.onUnitSphere; 
+        fleeDirection.y = 0; // Keep flee direction horizontal if appropriate for your game
+
+        Vector3 targetPosition = transform.position + fleeDirection * (minFleeSafeDistance + (maxEscapeDistance - minFleeSafeDistance) * 0.5f);
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(targetPosition, out hit, maxEscapeDistance, NavMesh.AllAreas))
+        {
+            escapePoint = hit.position;
+            agent.SetDestination(escapePoint);
+            agent.isStopped = false;
         }
         else
         {
-            Debug.LogWarning($"Enemy {gameObject.name} tried to attack but playerHealth is null!");
-        }
-    }
-
-    // Renamed from CalculateEscapePath to FleeFromPlayer for clarity
-    void FleeFromPlayer()
-    {
-        if (player == null || !agent.isOnNavMesh) return;
-
-        agent.speed = speed * 1.2f; // Flee slightly faster
-        agent.stoppingDistance = 0.5f; // Allow getting closer to flee point
-
-        // Get direction away from player
-        Vector3 directionFromPlayer = (transform.position - player.position).normalized;
-
-        // Try to find a valid escape point further away from the player
-        // And also try to maintain a minimum safe distance if possible
-        Vector3 potentialEscapePoint = transform.position + directionFromPlayer * maxEscapeDistance;
-        
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(potentialEscapePoint, out hit, maxEscapeDistance, NavMesh.AllAreas))
-        {
-            // Check if this point is further than minSafeDistance or at least further than current pos
-            float distToPlayerFromHit = Vector3.Distance(hit.position, player.position);
-            float currentDistToPlayer = Vector3.Distance(transform.position, player.position);
-
-            if (distToPlayerFromHit > currentDistToPlayer && distToPlayerFromHit > minFleeSafeDistance)
+            // Fallback: try a random point further away if direct flee path fails
+            for (int i = 0; i < 5; i++) // Try a few times
             {
-                agent.SetDestination(hit.position);
-                agent.isStopped = false;
-            }
-            else
-            {
-                // If we can't find a good point far away, try to find one just away from player
-                Vector3 awayPoint = transform.position + directionFromPlayer * 5f; // Move 5 units away
-                if (NavMesh.SamplePosition(awayPoint, out hit, 5f, NavMesh.AllAreas))
+                Vector3 randomDirection = Random.insideUnitSphere * maxEscapeDistance;
+                randomDirection.y = 0; // Keep horizontal
+                randomDirection += transform.position;
+                if (NavMesh.SamplePosition(randomDirection, out hit, maxEscapeDistance, NavMesh.AllAreas))
                 {
-                    agent.SetDestination(hit.position);
+                    escapePoint = hit.position;
+                    agent.SetDestination(escapePoint);
                     agent.isStopped = false;
-                }
-                else if (agent.hasPath) // If no good flee point, at least stop moving towards player
-                {
-                    agent.ResetPath();
+                    return; // Found a point
                 }
             }
-        }
-        else if (agent.hasPath) // If sampling fails, stop current path
-        {
-            agent.ResetPath();
+            Debug.LogWarning($"Enemy {gameObject.name} could not find a valid flee point after multiple attempts.");
+            if (agent.hasPath) agent.ResetPath(); // Stop if no valid flee point found
         }
     }
 
-    // Optional: Visualize attack range and detection radius in editor
-    void OnDrawGizmosSelected()
+    // Removed SetVulnerable as its logic is now handled by the state machine and UpdateStateOnOrbCollection
+    /*
+    public void SetVulnerable(bool vulnerable)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        Gizmos.color = Color.blue;
-        if (agent != null && agent.hasPath)
-        {
-            Gizmos.DrawLine(transform.position, agent.destination);
-        }
+        // ... old code ...
     }
+    */
 }

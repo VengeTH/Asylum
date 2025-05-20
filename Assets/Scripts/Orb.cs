@@ -4,6 +4,7 @@ public class Orb : MonoBehaviour
 {
     public float hunterDuration = 15f;
     private OrbManager orbManager;
+    private bool playerInRange = false;
 
     void Start()
     {
@@ -14,12 +15,31 @@ public class Orb : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            if (orbManager != null)
+            {
+                orbManager.PlayerHasCollectedOrb();
+                Destroy(gameObject);
+            }
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && orbManager != null)
+        if (other.CompareTag("Player"))
         {
-            orbManager.PlayerHasCollectedOrb(); // Changed to new method
-            Destroy(gameObject);
+            playerInRange = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
         }
     }
 }

@@ -17,7 +17,7 @@ public class EnemyAI : MonoBehaviour
     [Tooltip("Maximum escape distance from player when fleeing an orb")]
     public float maxEscapeDistance = 15f;
     [Tooltip("Minimum safe distance from player when fleeing an orb")]
-    public float minFleeSafeDistance = 8f; 
+    public float minFleeSafeDistance = 8f;
     [Tooltip("How often to recalculate escape path (seconds) when fleeing")]
     public float pathUpdateInterval = 0.5f;
     [Tooltip("Duration for fleeing after a normal orb pickup")]
@@ -46,6 +46,8 @@ public class EnemyAI : MonoBehaviour
     private PlayerHealth playerHealth;
     private float fleeEndTime;
     private float originalSpeed; // To store original speed before aggressive mode
+    private bool canAttack;
+    private float distanceToPlayer;
 
     void Awake()
     {
@@ -59,18 +61,29 @@ public class EnemyAI : MonoBehaviour
             {
                 player = playerObj.transform;
                 playerHealth = playerObj.GetComponent<PlayerHealth>();
+                Debug.Log($"Found player: {playerObj.name}, Health component: {(playerHealth != null ? "Found" : "NOT FOUND")}");
+            }
+            else
+            {
+                Debug.LogError("Player object not found with 'Player' tag!");
             }
         }
         else
         {
             playerHealth = player.GetComponent<PlayerHealth>();
+            Debug.Log($"Using assigned player: {player.name}, Health component: {(playerHealth != null ? "Found" : "NOT FOUND")}");
         }
 
         if (agent != null)
         {
-            originalSpeed = speed; // Store original speed
+            originalSpeed = speed;
             agent.speed = originalSpeed;
             agent.stoppingDistance = attackRange * 0.8f;
+            Debug.Log($"Enemy initialized with speed: {speed}, attack range: {attackRange}");
+        }
+        else
+        {
+            Debug.LogError("NavMeshAgent component missing!");
         }
 
         if (playerHealth == null)
@@ -79,19 +92,34 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Enemy {gameObject.name} initialized. Current state: {currentState}");
+            currentState = EnemyState.FollowingPlayer;
+            Debug.Log($"Enemy {gameObject.name} initialized. Current state: {currentState}, Attack damage: {normalAttackDamage}");
         }
     }
 
     // Called by GameManager when enough objectives are collected
     public void ActivateObjectiveBasedAggression()
     {
+        Debug.Log($"ActivateObjectiveBasedAggression called - Current state: {currentState}");
         if (isAttacking) EndAttackClean(); // Interrupt any ongoing attack
 
         currentState = EnemyState.AggressivePursuit;
         if (agent != null) agent.speed = originalSpeed * aggressiveModeSpeedMultiplier;
         fleeEndTime = 0; // Ensure not fleeing if switching from fleeing state
-        Debug.Log($"Enemy {gameObject.name}: Aggressive Pursuit activated due to objectives.");
+
+        // Set player invincible when entering hunter mode
+        if (playerHealth != null)
+        {
+            Debug.Log("Setting player invincible in hunter mode");
+            playerHealth.SetInvincible(true);
+            Debug.Log($"Player invincibility set in hunter mode - IsInvincible: {playerHealth.IsInvincible}");
+        }
+        else
+        {
+            Debug.LogError("PlayerHealth component not found when trying to set invincibility!");
+        }
+
+        Debug.Log($"Enemy {gameObject.name}: Aggressive Pursuit activated due to objectives. Current state: {currentState}");
     }
 
     // Called by OrbManager when an orb is collected
@@ -102,18 +130,59 @@ public class EnemyAI : MonoBehaviour
         if (agent != null) agent.speed = originalSpeed; // Reset to normal speed, even if was aggressive
         currentState = EnemyState.FleeingFromOrb;
         fleeEndTime = Time.time + fleeDuration;
+
+        // Remove player invincibility when leaving hunter mode
+        if (playerHealth != null)
+        {
+            playerHealth.SetInvincible(false);
+            Debug.Log("Player invincibility removed after leaving hunter mode");
+        }
+
         Debug.Log($"Enemy {gameObject.name}: Orb collected. Fleeing and deactivating any aggression. Current state: {currentState}");
     }
 
     void Update()
     {
-        if (player == null || agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        if (player == null)
         {
-            if (animator) animator.SetBool("Walk", false);
+            Debug.LogWarning("Player reference is null in EnemyAI Update");
             return;
         }
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        // Calculate distance to player
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        // Debug.Log($"Distance to player: {distanceToPlayer:F2}, Attack range: {attackRange}, Can attack: {canAttack}");
+
+        // Check if player is in attack range
+        bool inAttackRange = distanceToPlayer <= attackRange;
+
+        /* Commenting out animator code
+        if (animator) animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
+        */
+
+        // Handle movement and attack
+        if (!isAttacking)
+        {
+            if (inAttackRange)
+            {
+                // Stop and face the player
+                agent.isStopped = true;
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+
+                // Start attack if cooldown is ready
+                if (canAttack)
+                {
+                    Debug.Log($"ATTACK TRIGGERED - Distance: {distanceToPlayer:F2}, Range: {attackRange}");
+                    StartAttack(normalAttackDamage);
+                }
+            }
+            else
+            {
+                // Move towards player
+                agent.isStopped = false;
+                agent.SetDestination(player.transform.position);
+            }
+        }
 
         // Handle FleeingFromOrb state first as it's temporary and overrides others (except new aggressive trigger)
         if (currentState == EnemyState.FleeingFromOrb)
@@ -125,7 +194,9 @@ public class EnemyAI : MonoBehaviour
                     FleeFromPlayer();
                     nextPathUpdate = Time.time + pathUpdateInterval;
                 }
+                /* Commenting out animator code
                 if (animator) animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
+                */
                 return; // Prioritize fleeing
             }
             else
@@ -136,11 +207,20 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
+        // Force attack if very close to player
+        if (distanceToPlayer <= attackRange && !isAttacking && Time.time >= nextAttackTime)
+        {
+            Debug.Log($"ATTACK TRIGGERED - Distance: {distanceToPlayer:F2}, Range: {attackRange}");
+            StartAttack(normalAttackDamage);
+        }
+
         switch (currentState)
         {
             case EnemyState.Idle:
                 if (agent.hasPath) agent.ResetPath();
+                /* Commenting out animator code
                 if (animator) animator.SetBool("Walk", false);
+                */
                 if (distanceToPlayer <= detectionRadius)
                 {
                     currentState = EnemyState.FollowingPlayer;
@@ -174,20 +254,20 @@ public class EnemyAI : MonoBehaviour
                 }
                 break;
         }
-
-        if (animator && !isAttacking) // Don't override attack animation with walk
-        {
-            animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
-        }
     }
 
     void StartAttack(float damageAmount)
     {
-        if (isAttacking) return;
+        if (isAttacking)
+        {
+            Debug.Log("Already attacking, skipping attack");
+            return;
+        }
 
+        Debug.Log($"Starting attack sequence - Damage: {damageAmount}, Distance: {Vector3.Distance(transform.position, player.position):F2}");
         isAttacking = true;
         if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
-        
+
         PerformAttack(damageAmount);
         Invoke(nameof(EndAttack), attackAnimationDuration);
     }
@@ -208,12 +288,43 @@ public class EnemyAI : MonoBehaviour
 
     void PerformAttack(float damageAmount)
     {
-        if (playerHealth != null)
+        if (playerHealth == null)
         {
-            playerHealth.TakeDamage(damageAmount);
-            Debug.Log($"Enemy attacking player for {damageAmount} damage. Current state: {currentState}");
+            Debug.LogError("PlayerHealth is null in PerformAttack!");
+            return;
         }
-        if (animator) animator.SetTrigger("Attack"); // Ensure you have an "Attack" trigger in your Animator
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        Debug.Log($"Performing attack - Distance: {distanceToPlayer:F2}, Range: {attackRange}, Damage: {damageAmount}, Current state: {currentState}");
+
+        // Check if player is in hunter mode (AggressivePursuit state)
+        if (currentState == EnemyState.AggressivePursuit)
+        {
+            Debug.Log($"Attack blocked - Player in hunter mode (State: {currentState})");
+            return;
+        }
+
+        // Double check player invincibility
+        if (playerHealth.IsInvincible)
+        {
+            Debug.Log($"Attack blocked - Player is invincible (IsInvincible: {playerHealth.IsInvincible})");
+            return;
+        }
+
+        if (distanceToPlayer <= attackRange * 1.5f)
+        {
+            Debug.Log($"Dealing damage to player - Current health before: {playerHealth.currentHealth}, IsInvincible: {playerHealth.IsInvincible}");
+            playerHealth.TakeDamage(damageAmount);
+            Debug.Log($"Damage dealt - New health: {playerHealth.currentHealth}");
+        }
+        else
+        {
+            Debug.Log($"Player too far - Distance: {distanceToPlayer:F2}, Required: {attackRange}");
+        }
+
+        /* Commenting out animator code
+        if (animator) animator.SetTrigger("Attack");
+        */
     }
 
     void FleeFromPlayer()
@@ -222,7 +333,7 @@ public class EnemyAI : MonoBehaviour
 
         Vector3 fleeDirection = (transform.position - player.position).normalized;
         // Ensure fleeDirection is not zero (e.g., if enemy is exactly on player position)
-        if (fleeDirection == Vector3.zero) fleeDirection = Random.onUnitSphere; 
+        if (fleeDirection == Vector3.zero) fleeDirection = Random.onUnitSphere;
         fleeDirection.y = 0; // Keep flee direction horizontal if appropriate for your game
 
         Vector3 targetPosition = transform.position + fleeDirection * (minFleeSafeDistance + (maxEscapeDistance - minFleeSafeDistance) * 0.5f);

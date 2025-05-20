@@ -54,11 +54,12 @@ public class TimerManager : MonoBehaviour
             }
         }
 
-        // Log the state of UI elements
-        Debug.Log($"Panel found: {hunterModeTimerPanel != null}, PanelTimer found: {panelTimer != null}, Text found: {hunterModeTimerText != null}");
+        // Initialize hunter mode UI state
         if (hunterModeTimerPanel != null)
         {
-            Debug.Log($"Panel active in hierarchy: {hunterModeTimerPanel.activeInHierarchy}, Panel self active: {hunterModeTimerPanel.activeSelf}");
+            hunterModeTimerPanel.SetActive(false);
+            if (panelTimer != null) panelTimer.SetActive(false);
+            if (hunterModeTimerText != null) hunterModeTimerText.gameObject.SetActive(false);
         }
     }
 
@@ -69,7 +70,7 @@ public class TimerManager : MonoBehaviour
         UpdateTimeDisplay(mainTimerText, mainTimerSeconds); // This will now call the TMP overload
         StartMainTimer(); // Start the timer automatically
 
-        // Hide Hunter Mode UI by default
+        // Ensure Hunter Mode UI is hidden at start
         HideHunterModeUI();
     }
 
@@ -189,29 +190,23 @@ public class TimerManager : MonoBehaviour
 
     private void HideHunterModeUI()
     {
-        if (panelTimer != null)
+        if (hunterModeTimerPanel != null)
         {
-            panelTimer.SetActive(false);
-            Debug.Log("PanelTimer hidden");
-        }
-        if (hunterModeTimerText != null)
-        {
-            hunterModeTimerText.gameObject.SetActive(false);
-            Debug.Log("Hunter Mode Text hidden");
+            hunterModeTimerPanel.SetActive(false);
+            if (panelTimer != null) panelTimer.SetActive(false);
+            if (hunterModeTimerText != null) hunterModeTimerText.gameObject.SetActive(false);
+            Debug.Log("Hunter Mode UI hidden");
         }
     }
 
     private void ShowHunterModeUI()
     {
-        if (panelTimer != null)
+        if (hunterModeTimerPanel != null)
         {
-            panelTimer.SetActive(true);
-            Debug.Log("PanelTimer shown");
-        }
-        if (hunterModeTimerText != null)
-        {
-            hunterModeTimerText.gameObject.SetActive(true);
-            Debug.Log("Hunter Mode Text shown");
+            hunterModeTimerPanel.SetActive(true);
+            if (panelTimer != null) panelTimer.SetActive(true);
+            if (hunterModeTimerText != null) hunterModeTimerText.gameObject.SetActive(true);
+            Debug.Log("Hunter Mode UI shown");
         }
     }
 }

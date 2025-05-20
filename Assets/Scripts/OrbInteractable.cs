@@ -18,27 +18,67 @@ public class OrbInteractable : MonoBehaviour
             Debug.LogError("Player not found! Make sure it has tag 'Player'");
         }
 
+        // Find the interaction prompt if not assigned
         if (interactionPrompt == null)
         {
-            Debug.LogWarning("Interaction Prompt not assigned on orb: " + name);
+            // Try to find the interaction prompt in the canvas
+            Canvas[] canvases = FindObjectsOfType<Canvas>();
+            foreach (Canvas canvas in canvases)
+            {
+                Transform promptTransform = canvas.transform.Find("InteractionText");
+                if (promptTransform != null)
+                {
+                    interactionPrompt = promptTransform.gameObject;
+                    Debug.Log($"Found interaction prompt in canvas {canvas.name}: {interactionPrompt.name}");
+                    break;
+                }
+            }
+
+            if (interactionPrompt == null)
+            {
+                Debug.LogError("InteractionText not found in any canvas! Make sure it exists and is named 'InteractionText'");
+            }
+        }
+
+        // Ensure prompt is hidden at start
+        if (interactionPrompt != null)
+        {
+            interactionPrompt.SetActive(false);
+            Debug.Log($"Interaction prompt initialized and hidden for orb: {gameObject.name}");
         }
     }
 
     void Update()
     {
         if (playerTransform == null)
-            return;
+        {
+            // Try to find player again if lost
+            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+            if (playerTransform == null) return;
+        }
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
         if (distanceToPlayer <= interactionDistance && !isPlayerNearby)
         {
-            interactionPrompt.SetActive(true);
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.SetActive(true);
+                Debug.Log($"Showing interaction prompt for orb: {gameObject.name} at distance: {distanceToPlayer:F2}");
+            }
+            else
+            {
+                Debug.LogWarning($"Interaction prompt is null for orb: {gameObject.name}");
+            }
             isPlayerNearby = true;
         }
         else if (distanceToPlayer > interactionDistance && isPlayerNearby)
         {
-            interactionPrompt.SetActive(false);
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.SetActive(false);
+                Debug.Log($"Hiding interaction prompt for orb: {gameObject.name} at distance: {distanceToPlayer:F2}");
+            }
             isPlayerNearby = false;
         }
 
@@ -55,6 +95,7 @@ public class OrbInteractable : MonoBehaviour
         if (GameManager.instance != null)
         {
             GameManager.instance.CollectOrb();
+            Debug.Log($"Orb collected, notifying GameManager");
         }
         else
         {
@@ -63,7 +104,10 @@ public class OrbInteractable : MonoBehaviour
 
         // Hide the prompt
         if (interactionPrompt != null)
+        {
             interactionPrompt.SetActive(false);
+            Debug.Log($"Hiding interaction prompt after collection");
+        }
 
         // Destroy the orb
         Destroy(gameObject);

@@ -6,7 +6,7 @@ public class ObjectiveCollectible : MonoBehaviour
     public static event System.Action OnObjectiveCollected;
 
     // Objective Counter Variables
-    public static int totalObjectives = 5; // Default total, can be set in Inspector for one instance
+    public static int totalObjectives = 11; // Default total, can be set in Inspector for one instance
     private static int collectedObjectives = 0;
     public static TextMeshProUGUI objectiveCounterText; // Assign this in the Inspector for one of the collectibles
 
@@ -42,7 +42,7 @@ public class ObjectiveCollectible : MonoBehaviour
             playerInRange = true;
             if (collectPromptText != null) 
             {
-                collectPromptText.text = "Collect"; // Set the prompt text
+                collectPromptText.text = "Press E to Collect"; // Set the prompt text
                 collectPromptText.gameObject.SetActive(true);
             }
             // Debug.Log($"Player entered range of {objectiveName}"); // Optional: for debugging
@@ -96,23 +96,21 @@ public class ObjectiveCollectible : MonoBehaviour
     {
         if (objectiveCounterText != null)
         {
-            objectiveCounterText.text = $"Objectives: {collectedObjectives}/{totalObjectives}";
+            objectiveCounterText.text = $"Collect the objectives: {collectedObjectives}/{totalObjectives}";
         }
         else
         {
-            Debug.LogWarning("ObjectiveCounterText is not assigned in ObjectiveCollectible script.");
+            Debug.LogWarning("ObjectiveCounterText is not assigned. Cannot update counter.");
         }
     }
 
-    // Call this method if you need to reset the objectives (e.g., on game restart or level load)
-    public static void ResetObjectives(int newTotalObjectives)
+    // Static method to reset the objective counter
+    public static void ResetObjectives()
     {
         collectedObjectives = 0;
-        totalObjectives = newTotalObjectives;
-        UpdateObjectiveCounterText();
+        // Optionally, you could reset totalObjectives here if it's dynamic per level
+        // totalObjectives = 0; // Or some default/initial value for a new level
+        UpdateObjectiveCounterText(); // Update display after reset
+        Debug.Log("Objectives have been reset.");
     }
-
-    // Optional: Add fields for sound effects or particle effects if desired
-    // public AudioClip collectionSound;
-    // public GameObject collectionEffectPrefab;
 }

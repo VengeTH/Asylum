@@ -1457,7 +1457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Red Gem
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &381407214
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1857,7 +1857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Lighter
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &477007776
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2492,7 +2492,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Rusty Key
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &551979200
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2707,10 +2707,10 @@ GameObject:
   - component: {fileID: 597764378}
   m_Layer: 5
   m_Name: CollectObjectives
-  m_TagString: Untagged
+  m_TagString: ObjectiveCounterText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!224 &597764377
 RectTransform:
@@ -2751,7 +2751,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Collect the objectives: '
+  m_text: 'Collect the objectives: 0/11'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bfe0b17da6bf1c048944c376e0003a8b, type: 2}
   m_sharedMaterial: {fileID: 3937124501614630033, guid: bfe0b17da6bf1c048944c376e0003a8b, type: 2}
@@ -3489,7 +3489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb2679f304038c44dae1ef45b93957ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 542302409}
+  target: {fileID: 63711976}
   offset: {x: 0, y: 1.5, z: -3}
   smoothSpeed: 0.125
   rotationSpeed: 5
@@ -3564,13 +3564,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 698764771}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22307424, y: -0, z: -0, w: 0.97480154}
-  m_LocalPosition: {x: 0.12, y: 3.14, z: -12.98}
+  m_LocalRotation: {x: 0.45722544, y: -0, z: -0, w: 0.8893509}
+  m_LocalPosition: {x: 0.12, y: 1.901, z: -11.654}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 25.779, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 54.416, y: 0, z: 0}
 --- !u!1 &700649394
 GameObject:
   m_ObjectHideFlags: 0
@@ -4562,7 +4562,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Red ID
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &933957873
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5138,7 +5138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Valve
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1057337494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5244,7 +5244,7 @@ PrefabInstance:
     - target: {fileID: 8762286023885395323, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 542302409}
+      objectReference: {fileID: 63711976}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5783,7 +5783,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Blue USB
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1182938114
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6986,7 +6986,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Yellow Disk
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1432645456
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7156,11 +7156,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400374, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.537
+      value: 1.598
       objectReference: {fileID: 0}
     - target: {fileID: 400374, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.261
+      value: 0.327
       objectReference: {fileID: 0}
     - target: {fileID: 400374, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7194,6 +7194,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: ce8d02c7486f329448546e35400d755c, type: 2}
+    - target: {fileID: 9500000, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 13700000, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -7276,7 +7280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: White USB
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1497941107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9024,7 +9028,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Yellow Gem
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1904052929
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9127,7 +9131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Security ID
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1913045885
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9436,7 +9440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectiveName: Green Gem
-  collectPromptText: {fileID: 0}
+  collectPromptText: {fileID: 694000887}
 --- !u!65 &1983954999
 BoxCollider:
   m_ObjectHideFlags: 0

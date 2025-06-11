@@ -22,7 +22,7 @@ public class OrbInteractable : MonoBehaviour
         if (interactionPrompt == null)
         {
             // Try to find the interaction prompt in the canvas
-            Canvas[] canvases = FindObjectsOfType<Canvas>();
+            Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
             foreach (Canvas canvas in canvases)
             {
                 Transform promptTransform = canvas.transform.Find("InteractionText");

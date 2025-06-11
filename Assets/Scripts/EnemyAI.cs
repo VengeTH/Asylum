@@ -48,6 +48,8 @@ public class EnemyAI : MonoBehaviour
     private float originalSpeed; // To store original speed before aggressive mode
     private bool canAttack;
     private float distanceToPlayer;
+    private bool isStunned = false;
+    private float stunEndTime = 0f;
 
     void Awake()
     {
@@ -143,6 +145,17 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
+        if (isStunned)
+        {
+            agent.isStopped = true;
+            if (Time.time >= stunEndTime)
+            {
+                isStunned = false;
+                agent.isStopped = false;
+            }
+            return;
+        }
+
         if (player == null)
         {
             Debug.LogWarning("Player reference is null in EnemyAI Update");
@@ -156,9 +169,14 @@ public class EnemyAI : MonoBehaviour
         // Check if player is in attack range
         bool inAttackRange = distanceToPlayer <= attackRange;
 
-        /* Commenting out animator code
-        if (animator) animator.SetBool("Walk", agent.velocity.magnitude > 0.1f && agent.hasPath);
-        */
+        // --- ANIMATOR: MOVEMENT ---
+        if (animator != null)
+        {
+            bool walking = currentState == EnemyState.FollowingPlayer && !isAttacking && agent.velocity.magnitude > 0.1f && agent.speed == originalSpeed;
+            bool running = currentState == EnemyState.AggressivePursuit && !isAttacking && agent.velocity.magnitude > 0.1f && agent.speed > originalSpeed;
+            animator.SetBool("IsWalking", walking);
+            animator.SetBool("IsRunning", running);
+        }
 
         // Handle movement and attack
         if (!isAttacking)
@@ -268,6 +286,15 @@ public class EnemyAI : MonoBehaviour
         isAttacking = true;
         if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
 
+        // --- ANIMATOR: RANDOM ATTACK ---
+        if (animator != null)
+        {
+            if (Random.value < 0.5f)
+                animator.SetTrigger("Attack1_Trigger");
+            else
+                animator.SetTrigger("Attack2_Trigger");
+        }
+
         PerformAttack(damageAmount);
         Invoke(nameof(EndAttack), attackAnimationDuration);
     }
@@ -297,12 +324,12 @@ public class EnemyAI : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         Debug.Log($"Performing attack - Distance: {distanceToPlayer:F2}, Range: {attackRange}, Damage: {damageAmount}, Current state: {currentState}");
 
-        // Check if player is in hunter mode (AggressivePursuit state)
-        if (currentState == EnemyState.AggressivePursuit)
-        {
-            Debug.Log($"Attack blocked - Player in hunter mode (State: {currentState})");
-            return;
-        }
+        // Remove this block so enemy can be damaged in hunter mode
+        //if (currentState == EnemyState.AggressivePursuit)
+        //{
+        //    Debug.Log($"Attack blocked - Player in hunter mode (State: {currentState})");
+        //    return;
+        //}
 
         // Double check player invincibility
         if (playerHealth.IsInvincible)
@@ -364,6 +391,37 @@ public class EnemyAI : MonoBehaviour
             Debug.LogWarning($"Enemy {gameObject.name} could not find a valid flee point after multiple attempts.");
             if (agent.hasPath) agent.ResetPath(); // Stop if no valid flee point found
         }
+    }
+
+    // --- ANIMATOR: GET HIT ---
+    public void PlayGetHitAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("GetHit_Trigger");
+            // Also trigger attack animation when taking damage
+            if (Random.value < 0.5f)
+                animator.SetTrigger("Attack1_Trigger");
+            else
+                animator.SetTrigger("Attack2_Trigger");
+        }
+    }
+
+    // --- ANIMATOR: DEATH ---
+    public void PlayDeathAnimation()
+    {
+        if (animator != null)
+            animator.SetTrigger("Death_Trigger");
+    }
+
+    public void Stun(float duration)
+    {
+        isStunned = true;
+        stunEndTime = Time.time + duration;
+        agent.isStopped = true;
+        canAttack = false;
+        PlayGetHitAnimation();
+        Debug.Log($"Enemy {gameObject.name} stunned for {duration} seconds.");
     }
 
     // Removed SetVulnerable as its logic is now handled by the state machine and UpdateStateOnOrbCollection

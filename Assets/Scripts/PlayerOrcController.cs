@@ -6,6 +6,7 @@ public class PlayerOrcController : MonoBehaviour
     public float currentHealth = 100f; // Player's current health
     public float maxHealth = 100f;     // Player's maximum health
     private bool isDead = false;       // Flag to check if player is dead
+    public SwordAttack swordAttack;
 
     // Start is called before the first frame update
     void Start()
@@ -38,45 +39,58 @@ public class PlayerOrcController : MonoBehaviour
         if (currentHealth <= 0)
         {
             isDead = true;
-            animator.SetTrigger("Death_Tri"); // Ensure "Death_Tri" matches your Animator parameter (should trigger 'gethit')
-            Debug.Log("Health depleted - Triggering Death_Tri");
+            animator.SetTrigger("Death_Trigger"); // Ensure "Death_Trigger" matches your Animator parameter (should trigger 'gethit')
+            Debug.Log("Health depleted - Triggering Death_Trigger");
             // Optional: Disable player controls or other components here
             // enabled = false; // Disables this script if you want to stop all updates
             return; // Stop further input processing this frame
         }
 
         // --- MOVEMENT ---
-        // WASD input controls walking.
-        // Stopping (no WASD input) should lead back to Idle via Animator transitions.
-        // Ensure "IsWalking" is a parameter in your Animator Controller.
-        // Transition from Idle to Walk: IsWalking == true
-        // Transition from Walk to Idle: IsWalking == false
-        bool isMoving = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
-        animator.SetBool("IsWalking", isMoving);
+        // Use CharacterController's velocity to determine if the player is moving
+        CharacterController cc = GetComponent<CharacterController>();
+        bool isMoving = false;
+        bool isGrounded = false;
+        if (cc != null)
+        {
+            Vector3 horizontalVelocity = cc.velocity;
+            horizontalVelocity.y = 0f;
+            isMoving = horizontalVelocity.magnitude > 0.1f;
+            isGrounded = cc.isGrounded;
+        }
+        else
+        {
+            // fallback: WASD input (for non-CharacterController setups)
+            isMoving = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
+            // fallback: always grounded
+            isGrounded = true;
+        }
+        animator.SetBool("IsWalking_Bool", isMoving);
+        animator.SetBool("IsGrounded", isGrounded);
 
         // --- JUMP ---
-        // Spacebar triggers jump.
-        // Ensure "Jump_Trig" is a Trigger parameter in your Animator Controller.
-        // Transition from Any State (or Idle/Walk) to Jump: Condition on Jump_Trig.
-        // The Jump animation state should ideally have "Has Exit Time" checked to automatically
-        // transition back to Idle/Walk after the animation completes.
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Only trigger jump animation when leaving the ground
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            // Consider adding a check here if the player is grounded before allowing a jump.
-            animator.SetTrigger("Jump_Trig");
-            Debug.Log("Spacebar pressed - Triggering Jump_Trig");
+            animator.SetTrigger("Jump_Trigger");
+            Debug.Log("Spacebar pressed - Triggering Jump_Trigger");
         }
 
         // --- ATTACK ---
-        // Right mouse click triggers attack.
-        // Ensure "Attack1_T" is a Trigger parameter in your Animator Controller.
-        // Transition from Any State (or Idle/Walk) to Attack: Condition on Attack1_T.
-        // The Attack animation state should also ideally have "Has Exit Time" checked.
-        if (Input.GetMouseButtonDown(1)) // 1 corresponds to the right mouse button
+        // Only allow attack in hunter mode
+        if (Input.GetMouseButtonDown(0)) // 0 corresponds to the left mouse button
         {
-            // Consider adding checks here, e.g., if not already attacking, or if grounded.
-            animator.SetTrigger("Attack1_T");
-            Debug.Log("Right mouse button pressed - Triggering Attack1_T");
+            if (GameManager.instance != null && GameManager.instance.isTransformed)
+            {
+                animator.SetTrigger("Attack1_Trigger");
+                if (swordAttack != null)
+                    swordAttack.TriggerAttack();
+                Debug.Log("Left mouse button pressed - Triggering Attack1_Trigger (Hunter Mode)");
+            }
+            else
+            {
+                Debug.Log("Attack ignored: Not in Hunter Mode");
+            }
         }
 
         // --- TRIGGERS (ONE-SHOT ACTIONS) --- (Example: Ability1 - Temporarily commented out)
@@ -109,16 +123,16 @@ public class PlayerOrcController : MonoBehaviour
         // ("OrcDestroyer2 Animator Controller" or similar).
         // Key things to check in the Animator Controller:
         // 1. Parameter Names: Ensure they EXACTLY match the strings used in this script
-        //    (e.g., "IsWalking", "Jump_Trig", "Attack1_T", "Death_Tri").
+        //    (e.g., "IsWalking_Bool", "Jump_Trigger", "Attack1_Trigger", "Death_Trigger").
         //    Case sensitivity matters!
         // 2. Transitions:
-        //    - From Idle to Walk: Conditioned on "IsWalking" == true.
-        //    - From Walk to Idle: Conditioned on "IsWalking" == false.
-        //    - From Any State (or Idle/Walk) to Jump: Conditioned on "Jump_Trig".
+        //    - From Idle to Walk: Conditioned on "IsWalking_Bool" == true.
+        //    - From Walk to Idle: Conditioned on "IsWalking_Bool" == false.
+        //    - From Any State (or Idle/Walk) to Jump: Conditioned on "Jump_Trigger".
         //      - The Jump state should then transition back (e.g., to Idle or Walk) usually after it finishes (use "Has Exit Time" on the Jump state).
-        //    - From Any State (or Idle/Walk) to Attack1: Conditioned on "Attack1_T".
+        //    - From Any State (or Idle/Walk) to Attack1: Conditioned on "Attack1_Trigger".
         //      - The Attack1 state should also transition back after finishing.
-        //    - From Any State to Death (sequence starting with 'gethit'): Conditioned on "Death_Tri".
+        //    - From Any State to Death (sequence starting with 'gethit'): Conditioned on "Death_Trigger".
         //      - The Death state is often a final state with no automatic exit.
         // 3. "Has Exit Time" on Animation States:
         //    - For states like Attack or Jump that should play once and then return:
@@ -131,4 +145,19 @@ public class PlayerOrcController : MonoBehaviour
         //    Focus on getting the Base Layer correct first.
         // 5. Default State: Ensure your "Idle" animation is set as the Default State in the Animator Controller layer.
     }
+
+    // Play the get hit animation from other scripts (e.g., when taking damage)
+    public void PlayGetHitAnimation()
+    {
+        if (animator != null && !isDead)
+        {
+            animator.SetTrigger("GetHit_Trigger");
+            Debug.Log("GetHit_Trigger activated");
+        }
+    }
+
+    // --- GET HIT (EXAMPLE USAGE) ---
+    // To play the get hit animation, call PlayGetHitAnimation() from another script when the player takes damage.
+    // Example:
+    //   GetComponent<PlayerOrcController>().PlayGetHitAnimation();
 }

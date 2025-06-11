@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     public GameObject player;
 
     private EnemyAI[] cachedEnemies;
-    private bool isTransformed = false;
+    public bool isTransformed = false;
     private bool gameWon = false;
 
     private void Awake()
@@ -227,6 +227,20 @@ public class GameManager : MonoBehaviour
         {
             firstPersonCam.enabled = true;
             thirdPersonCam.enabled = false;
+            firstPersonCam.fieldOfView = 90f; // Reset FOV to default
+
+            // Also reset FOV on FirstPersonController if present
+            if (player != null)
+            {
+                var fpc = player.GetComponent<FirstPersonController>();
+                if (fpc != null)
+                {
+                    fpc.fov = 90f;
+                    // If the controller has a reference to the camera, update it too
+                    if (fpc.playerCamera != null)
+                        fpc.playerCamera.fieldOfView = 90f;
+                }
+            }
         }
 
         // Refresh enemy cache

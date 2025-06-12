@@ -4,6 +4,9 @@ public class OrbInteractable : MonoBehaviour
 {
     public float interactionDistance = 2f;
     public GameObject interactionPrompt; // Assign your "E to Collect" Text here
+    public AudioClip pickupSound;
+    public float pickupSoundVolume = 1.2f; // 120% volume
+    private AudioSource audioSource;
 
     private Transform playerTransform;
     private bool isPlayerNearby = false;
@@ -45,6 +48,13 @@ public class OrbInteractable : MonoBehaviour
         {
             interactionPrompt.SetActive(false);
             Debug.Log($"Interaction prompt initialized and hidden for orb: {gameObject.name}");
+        }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogWarning("OrbInteractable: AudioSource component not found. Adding one.");
+            audioSource = gameObject.AddComponent<AudioSource>();
         }
     }
 
@@ -91,6 +101,20 @@ public class OrbInteractable : MonoBehaviour
 
     void Collect()
     {
+        // Play pickup sound
+        if (pickupSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(pickupSound, pickupSoundVolume);
+        }
+        else if (pickupSound == null)
+        {
+            Debug.LogWarning($"Pickup sound not assigned for orb: {gameObject.name}");
+        }
+        else if (audioSource == null) // Should not happen if Start() is correct
+        {
+            Debug.LogWarning($"AudioSource not found for orb: {gameObject.name}, cannot play sound.");
+        }
+
         // Notify GameManager
         if (GameManager.instance != null)
         {
@@ -110,6 +134,9 @@ public class OrbInteractable : MonoBehaviour
         }
 
         // Destroy the orb
+        // For short sounds, PlayOneShot is fine before Destroy.
+        // If the sound is long, consider playing it on a separate, persistent AudioSource
+        // or delaying the Destroy call.
         Destroy(gameObject);
     }
 }

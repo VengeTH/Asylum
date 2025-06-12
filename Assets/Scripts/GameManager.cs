@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
     [Header("Player References")]
     public GameObject player;
 
+    private AudioListener firstPersonListener;
+    private AudioListener thirdPersonListener;
+
     private EnemyAI[] cachedEnemies;
     public bool isTransformed = false;
     private bool gameWon = false;
@@ -62,6 +65,10 @@ public class GameManager : MonoBehaviour
             thirdPersonCam = GameObject.Find("Camera_ThirdPerson")?.GetComponent<Camera>();
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player");
+
+        // Get AudioListener components
+        if (firstPersonCam != null) firstPersonListener = firstPersonCam.GetComponent<AudioListener>();
+        if (thirdPersonCam != null) thirdPersonListener = thirdPersonCam.GetComponent<AudioListener>();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -75,12 +82,18 @@ public class GameManager : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player");
             timerManager = FindAnyObjectByType<TimerManager>();
 
-            // Set initial camera state
+            // Get AudioListener components for new scene
+            if (firstPersonCam != null) firstPersonListener = firstPersonCam.GetComponent<AudioListener>();
+            if (thirdPersonCam != null) thirdPersonListener = thirdPersonCam.GetComponent<AudioListener>();
+
+            // Set initial camera and listener state
             if (firstPersonCam != null && thirdPersonCam != null)
             {
                 firstPersonCam.enabled = true;
                 thirdPersonCam.enabled = false;
-                Debug.Log("Cameras found and initialized in new scene");
+                if (firstPersonListener != null) firstPersonListener.enabled = true;
+                if (thirdPersonListener != null) thirdPersonListener.enabled = false;
+                Debug.Log("Cameras and listeners found and initialized in new scene");
             }
             else
             {
@@ -94,16 +107,22 @@ public class GameManager : MonoBehaviour
         // Cache enemies at start
         RefreshEnemiesCache();
 
-        // Set initial camera state
+        // Set initial camera and listener state
         if (firstPersonCam != null && thirdPersonCam != null)
         {
             firstPersonCam.enabled = true;
             thirdPersonCam.enabled = false;
+            if (firstPersonListener != null) firstPersonListener.enabled = true;
+            if (thirdPersonListener != null) thirdPersonListener.enabled = false;
         }
         else
         {
             Debug.LogError("Camera references not set in GameManager!");
         }
+
+        // Ensure listeners are correctly fetched if cameras were found later
+        if (firstPersonListener == null && firstPersonCam != null) firstPersonListener = firstPersonCam.GetComponent<AudioListener>();
+        if (thirdPersonListener == null && thirdPersonCam != null) thirdPersonListener = thirdPersonCam.GetComponent<AudioListener>();
 
         // Subscribe to TimerManager event
         if (timerManager != null)
@@ -188,11 +207,13 @@ public class GameManager : MonoBehaviour
         {
             firstPersonCam.enabled = false;
             thirdPersonCam.enabled = true;
-            Debug.Log("Switched to third person camera for hunter mode");
+            if (firstPersonListener != null) firstPersonListener.enabled = false;
+            if (thirdPersonListener != null) thirdPersonListener.enabled = true;
+            Debug.Log("Switched to third person camera and listener for hunter mode");
         }
         else
         {
-            Debug.LogError($"Failed to switch cameras. FirstPerson: {firstPersonCam != null}, ThirdPerson: {thirdPersonCam != null}");
+            Debug.LogError($"Failed to switch cameras/listeners. FirstPersonCam: {firstPersonCam != null}, ThirdPersonCam: {thirdPersonCam != null}");
         }
 
         // Refresh enemy cache to ensure we have all enemies
@@ -218,43 +239,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void DeactivateHunterMode()
+    public void DeactivateHunterMode()
     {
+        Debug.Log("Hunter Mode Deactivated!");
         isTransformed = false;
-        collectedOrbs = 0;
+        collectedOrbs = 0; // Reset orbs after transformation ends
 
+        // Switch back to first-person camera and listener
         if (firstPersonCam != null && thirdPersonCam != null)
         {
             firstPersonCam.enabled = true;
             thirdPersonCam.enabled = false;
-            firstPersonCam.fieldOfView = 90f; // Reset FOV to default
-
-            // Also reset FOV on FirstPersonController if present
-            if (player != null)
-            {
-                var fpc = player.GetComponent<FirstPersonController>();
-                if (fpc != null)
-                {
-                    fpc.fov = 90f;
-                    // If the controller has a reference to the camera, update it too
-                    if (fpc.playerCamera != null)
-                        fpc.playerCamera.fieldOfView = 90f;
-                }
-            }
+            if (firstPersonListener != null) firstPersonListener.enabled = true;
+            if (thirdPersonListener != null) thirdPersonListener.enabled = false;
+            Debug.Log("Switched back to first person camera and listener");
         }
-
-        // Refresh enemy cache
-        RefreshEnemiesCache();
-
-        // Make enemies flee when hunter mode ends
-        foreach (EnemyAI enemy in cachedEnemies)
+        else
         {
-            if (enemy != null)
-            {
-                enemy.FleeFromOrbAndDeactivateAggression();
-                Debug.Log($"Deactivated aggressive pursuit for enemy: {enemy.gameObject.name}");
-            }
+            Debug.LogError($"Failed to switch back cameras/listeners. FirstPersonCam: {firstPersonCam != null}, ThirdPersonCam: {thirdPersonCam != null}");
         }
+
+        // Make enemies flee
+        RefreshEnemiesCache();
     }
 
     /// <summary>

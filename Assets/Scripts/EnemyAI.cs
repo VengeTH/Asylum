@@ -51,6 +51,13 @@ public class EnemyAI : MonoBehaviour
     private bool isStunned = false;
     private float stunEndTime = 0f;
 
+    [Header("Audio Settings")]
+    public AudioClip monsterGrowlSound;
+    public float minGrowlInterval = 5f;
+    public float maxGrowlInterval = 10f;
+    private AudioSource audioSource;
+    private float nextGrowlTime;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -97,6 +104,13 @@ public class EnemyAI : MonoBehaviour
             currentState = EnemyState.FollowingPlayer;
             Debug.Log($"Enemy {gameObject.name} initialized. Current state: {currentState}, Attack damage: {normalAttackDamage}");
         }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        SetNextGrowlTime();
     }
 
     // Called by GameManager when enough objectives are collected
@@ -179,6 +193,8 @@ public class EnemyAI : MonoBehaviour
         }
 
         // Handle movement and attack
+        HandleGrowlSound();
+
         if (!isAttacking)
         {
             if (inAttackRange)
@@ -431,4 +447,33 @@ public class EnemyAI : MonoBehaviour
         // ... old code ...
     }
     */
+
+    void SetNextGrowlTime()
+    {
+        nextGrowlTime = Time.time + Random.Range(minGrowlInterval, maxGrowlInterval);
+    }
+
+    void HandleGrowlSound()
+    {
+        if (monsterGrowlSound != null && audioSource != null && Time.time >= nextGrowlTime)
+        {
+            if (currentState == EnemyState.FollowingPlayer || currentState == EnemyState.AggressivePursuit)
+            {
+                if (!isAttacking && agent.velocity.magnitude > 0.1f) // Only growl if moving/pursuing and not attacking
+                {
+                    audioSource.PlayOneShot(monsterGrowlSound);
+                    SetNextGrowlTime();
+                }
+                else if (!isAttacking && agent.velocity.magnitude <= 0.1f && currentState == EnemyState.FollowingPlayer) // Idle growl when following but not moving (e.g. player is close but enemy is stuck or waiting)
+                {
+                    // Potentially a different, more subtle growl or lower chance here
+                    if(Random.value < 0.3f) // 30% chance to growl if idle but aware
+                    {
+                        audioSource.PlayOneShot(monsterGrowlSound);
+                        SetNextGrowlTime();
+                    }
+                }
+            }
+        }
+    }
 }

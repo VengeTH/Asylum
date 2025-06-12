@@ -494,6 +494,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &140218365
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -849,7 +851,7 @@ MonoBehaviour:
   interactionDistance: 2
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
-  maxRotationAngle: 90
+  maxRotationAngle: 110
 --- !u!1 &237884273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1045,23 +1047,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 26.543
+      value: 26.273
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.719
+      value: -2.823
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.72
+      value: 0.757
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.86722594
+      value: 0.701529
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.49791488
+      value: -0.71264094
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalRotation.y
@@ -1073,7 +1075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -59.724
+      value: -90.9
       objectReference: {fileID: 0}
     - target: {fileID: 2064528758812107699, guid: 319dd94a1b94d5d42828fc9a55f6b6fb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -1397,6 +1399,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Red Gem
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &381407214
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1416,8 +1420,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6842017, y: 0.08740711, z: 0.6353779}
-  m_Center: {x: -0.28913474, y: 0.0400877, z: -0.06086254}
+  m_Size: {x: 0.68420166, y: 0.13810539, z: 0.7442668}
+  m_Center: {x: -0.28913474, y: 0.06543684, z: -0.11530749}
 --- !u!1 &402456462
 GameObject:
   m_ObjectHideFlags: 0
@@ -1797,6 +1801,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Lighter
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &477007776
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2133,6 +2139,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &538674867
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2260,6 +2268,7 @@ MonoBehaviour:
   currentHealth: 100
   maxHealth: 100
   swordAttack: {fileID: 1899473529}
+  footstepSound: {fileID: 8300000, guid: c5ce1da07f4f81b4881d617b5736ddad, type: 3}
 --- !u!1 &547431898
 GameObject:
   m_ObjectHideFlags: 0
@@ -2487,6 +2496,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Rusty Key
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 5
 --- !u!65 &551979200
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2506,8 +2517,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6078353, y: 0.08782381, z: 0.48892117}
-  m_Center: {x: -0.19183636, y: 0.010824293, z: 0.18410254}
+  m_Size: {x: 0.6078353, y: 0.21740437, z: 0.5850668}
+  m_Center: {x: -0.19183636, y: 0.07561457, z: 0.23217535}
 --- !u!1001 &581049481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3024,7 +3035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -3190,7 +3201,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5.5, y: 18.3}
+  m_AnchoredPosition: {x: -12, y: -91.3}
   m_SizeDelta: {x: 416.4536, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &694000887
@@ -3405,7 +3416,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 698764771}
-  m_Enabled: 0
+  m_Enabled: 1
 --- !u!20 &698764774
 Camera:
   m_ObjectHideFlags: 0
@@ -3964,7 +3975,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 4
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -4179,6 +4190,7 @@ GameObject:
   - component: {fileID: 898706146}
   - component: {fileID: 898706150}
   - component: {fileID: 898706151}
+  - component: {fileID: 898706152}
   m_Layer: 0
   m_Name: Orb
   m_TagString: Orb
@@ -4287,8 +4299,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b5fa92c535bea4dbc28ea7d9a4600c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 3
 --- !u!114 &898706151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4302,6 +4316,103 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hunterDuration: 15
+--- !u!82 &898706152
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 898706145}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  m_Resource: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &917559518
 GameObject:
   m_ObjectHideFlags: 0
@@ -4386,6 +4497,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Red ID
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &933957873
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4405,8 +4518,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.7677269, y: 1.702105, z: 1}
-  m_Center: {x: 0.11613655, y: 0.35105252, z: 0}
+  m_Size: {x: 0.8902092, y: 1.702105, z: 1}
+  m_Center: {x: 0.0548954, y: 0.35105252, z: 0}
 --- !u!1 &935308837
 GameObject:
   m_ObjectHideFlags: 0
@@ -4474,7 +4587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -4913,6 +5026,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &1021371533
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5097,7 +5212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -5125,6 +5240,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Valve
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1057337494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5163,7 +5280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -5602,6 +5719,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &1165630458
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5788,6 +5907,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Blue USB
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1182938114
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5807,8 +5928,13 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.1140842, y: 1.2675731, z: 1.0349967}
-  m_Center: {x: 0.057042122, y: 0.13378656, z: -0.017498374}
+  m_Size: {x: 1.1140842, y: 1.4922464, z: 1.0349967}
+  m_Center: {x: 0.057042122, y: 0.2461232, z: -0.017498374}
+--- !u!1 &1198972068 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100374, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
+  m_PrefabInstance: {fileID: 1480437887}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1203135719
 GameObject:
   m_ObjectHideFlags: 0
@@ -6026,8 +6152,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collectedOrbs: 0
   orbsRequiredForTransformation: 1
-  hunterDuration: 15
-  totalObjectivesInScene: 11
+  hunterDuration: 25
+  totalObjectivesInScene: 10
   timerManager: {fileID: 0}
   firstPersonCam: {fileID: 1657754698}
   thirdPersonCam: {fileID: 698764774}
@@ -6499,15 +6625,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6334826068141619242, guid: 5bba62d8b65dae44898012275d24ba9e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.085
+      value: 21.71
       objectReference: {fileID: 0}
     - target: {fileID: 6334826068141619242, guid: 5bba62d8b65dae44898012275d24ba9e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.33
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 6334826068141619242, guid: 5bba62d8b65dae44898012275d24ba9e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.58
+      value: -30.99
       objectReference: {fileID: 0}
     - target: {fileID: 6334826068141619242, guid: 5bba62d8b65dae44898012275d24ba9e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6643,6 +6769,27 @@ MonoBehaviour:
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
+--- !u!65 &1310990677
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310990667}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3210219, y: 0.63421154, z: 0.29811442}
+  m_Center: {x: 0.6627814, y: -0.9815967, z: -0.05014406}
 --- !u!1 &1325004879
 GameObject:
   m_ObjectHideFlags: 0
@@ -6993,6 +7140,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Yellow Disk
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1432645456
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7008,12 +7157,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.42895216, z: 0.7783219}
+  m_Center: {x: 0, y: 0.25349835, z: 0.11083903}
 --- !u!1 &1439850864 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8604493625292303692, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
@@ -7031,10 +7180,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
+--- !u!65 &1439850874
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439850864}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3210219, y: 0.69589376, z: 0.24235328}
+  m_Center: {x: 0.662782, y: -1.0179691, z: -0.022261642}
 --- !u!1 &1469065971
 GameObject:
   m_ObjectHideFlags: 0
@@ -7135,6 +7305,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &1469213477
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9160,6 +9332,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100028, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       insertIndex: -1
       addedObject: {fileID: 542302410}
+    - targetCorrespondingSourceObject: {fileID: 100374, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1657754701}
     - targetCorrespondingSourceObject: {fileID: 100430, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1899473527}
@@ -9189,6 +9364,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: White USB
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1497941107
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9521,18 +9698,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 63711976}
-  speed: 9
-  detectionRadius: 15
-  maxEscapeDistance: 20
-  minFleeSafeDistance: 20
-  pathUpdateInterval: 0.5
-  fleeDuration: 15
+  speed: 6
+  detectionRadius: 8
+  maxEscapeDistance: 9
+  minFleeSafeDistance: 7
+  pathUpdateInterval: 2
+  fleeDuration: 1
   aggressiveModeSpeedMultiplier: 1.5
   attackRange: 2
   normalAttackDamage: 10
   aggressiveModeAttackDamage: 20
-  attackCooldown: 1.5
+  attackCooldown: 2
   attackAnimationDuration: 0.5
+  monsterGrowlSound: {fileID: 8300000, guid: be76e9b4d344e5f419d71cbf7925134a, type: 3}
+  minGrowlInterval: 3
+  maxGrowlInterval: 6
 --- !u!54 &1602957841
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9680,6 +9860,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionDistance: 2
   interactionPrompt: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: e40bb4254bd5ab44db6bc10a604adfb6, type: 3}
+  pickupSoundVolume: 1.2
 --- !u!135 &1612772544
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9850,6 +10032,14 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 2000000, guid: 8d04ac4429a0669408c96276dc933726, type: 3}
   m_PrefabInstance: {fileID: 1480437887}
   m_PrefabAsset: {fileID: 0}
+--- !u!81 &1657754701
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198972068}
+  m_Enabled: 1
 --- !u!1 &1674408784
 GameObject:
   m_ObjectHideFlags: 0
@@ -10026,7 +10216,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5.5, y: 81.79}
+  m_AnchoredPosition: {x: -5.5, y: -142}
   m_SizeDelta: {x: 416.4536, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1713194124
@@ -10907,7 +11097,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 3
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
   maxRotationAngle: 90
@@ -10981,6 +11171,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Yellow Gem
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1904052929
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11084,6 +11276,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Security ID
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1913045885
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11103,8 +11297,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.3458177, y: 1, z: 0.75570554}
+  m_Center: {x: -0.022543482, y: 0, z: 0.14987879}
 --- !u!4 &1915320027 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9005220659476430818, guid: 2d3a85ecde41a8246a79669975912b74, type: 3}
@@ -11174,6 +11368,52 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1291821140}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1936411212
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1936411214}
+  - component: {fileID: 1936411213}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1936411213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936411212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dec27bc3afc041645bc0f50ee2c9f5d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  universalBackgroundMusic: {fileID: 8300000, guid: b6000804b959e714b945ae2518801509, type: 3}
+  backgroundMusicVolume: 0.8
+--- !u!4 &1936411214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936411212}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.1797259, y: 1.1104448, z: -3.5472126}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1966297428
 GameObject:
@@ -11321,7 +11561,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.405
+      value: -7.37
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -11329,23 +11569,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.012
+      value: -10.977
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9249538
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.38007972
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -11353,7 +11593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 44.677
       objectReference: {fileID: 0}
     - target: {fileID: 799308595074901087, guid: 66593823cd17b4d4ab2ff2ae726e4c5f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -11393,6 +11633,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveName: Green Gem
   collectPromptText: {fileID: 694000887}
+  collectionSound: {fileID: 8300000, guid: 5351c1ab9d3623a46929b072cdf36a4f, type: 3}
+  collectionSoundVolume: 1.2
 --- !u!65 &1983954999
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11412,8 +11654,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.85911083, y: 1, z: 1}
-  m_Center: {x: 0.070444584, y: 0, z: 0}
+  m_Size: {x: 0.9394007, y: 1, z: 1}
+  m_Center: {x: 0.030299664, y: 0, z: 0}
 --- !u!1 &1985026268
 GameObject:
   m_ObjectHideFlags: 0
@@ -11856,10 +12098,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d6c1c6454d2e140bc9e2a4ff380b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionDistance: 2
+  interactionDistance: 4
   interactionPrompt: {fileID: 1713194122}
   rotationSpeed: 90
-  maxRotationAngle: 90
+  maxRotationAngle: 100
+--- !u!65 &2052463058
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052463048}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.321022, y: 0.47659206, z: 0.27684852}
+  m_Center: {x: 0.66278166, y: -0.99425805, z: -0.039507262}
 --- !u!1 &2108007842
 GameObject:
   m_ObjectHideFlags: 0
@@ -16806,7 +17069,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8610424505735487306, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.974
+      value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8613527497262800904, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8613527497262800904, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8613830467024417188, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8613992670163181204, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8614262653606106590, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       propertyPath: m_Convex
@@ -16814,6 +17093,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8614262653606106590, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8614470453217814386, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8912249506698320856, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
@@ -16972,12 +17255,21 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8605099728537489648, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1310990672}
+    - targetCorrespondingSourceObject: {fileID: 8605099728537489648, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1310990677}
     - targetCorrespondingSourceObject: {fileID: 8604727305006825642, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2052463053}
+    - targetCorrespondingSourceObject: {fileID: 8604727305006825642, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2052463058}
     - targetCorrespondingSourceObject: {fileID: 8604493625292303692, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1439850869}
+    - targetCorrespondingSourceObject: {fileID: 8604493625292303692, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1439850874}
     - targetCorrespondingSourceObject: {fileID: 8606311150240844717, guid: beef3bcde1610f04aa96275436147bb9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6700937}
@@ -17031,3 +17323,4 @@ SceneRoots:
   - {fileID: 1638982028}
   - {fileID: 86059814}
   - {fileID: 975678826}
+  - {fileID: 1936411214}

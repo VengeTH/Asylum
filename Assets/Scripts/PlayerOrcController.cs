@@ -7,6 +7,8 @@ public class PlayerOrcController : MonoBehaviour
     public float maxHealth = 100f;     // Player's maximum health
     private bool isDead = false;       // Flag to check if player is dead
     public SwordAttack swordAttack;
+    public AudioClip footstepSound;
+    private AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +18,13 @@ public class PlayerOrcController : MonoBehaviour
         {
             Debug.LogError("PlayerOrcController: Animator component not found on this GameObject.");
             enabled = false; // Disable script if no animator
+        }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogWarning("PlayerOrcController: AudioSource component not found on this GameObject. Adding one.");
+            audioSource = gameObject.AddComponent<AudioSource>();
         }
     }
 
@@ -67,6 +76,23 @@ public class PlayerOrcController : MonoBehaviour
         }
         animator.SetBool("IsWalking_Bool", isMoving);
         animator.SetBool("IsGrounded", isGrounded);
+
+        // --- FOOTSTEP SOUNDS ---
+        if (isMoving && isGrounded)
+        {
+            if (footstepSound != null && !audioSource.isPlaying)
+            {
+                audioSource.clip = footstepSound;
+                audioSource.Play();
+            }
+        }
+        else
+        {
+            if (audioSource.isPlaying && audioSource.clip == footstepSound) // Stop only if it's the footstep sound
+            {
+                audioSource.Stop();
+            }
+        }
 
         // --- JUMP ---
         // Only trigger jump animation when leaving the ground

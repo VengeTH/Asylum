@@ -12,6 +12,9 @@ public class ObjectiveCollectible : MonoBehaviour
 
     public string objectiveName = "Collectible Objective"; // Name for this objective, can be customized in Inspector
     public TextMeshProUGUI collectPromptText; // Reference to the TextMeshPro UI element for the prompt
+    public AudioClip collectionSound; // Sound to play when collected
+    public float collectionSoundVolume = 1.2f; // 120% volume
+    private AudioSource audioSource; // AudioSource component
 
     private bool isCollected = false;
     private bool playerInRange = false; // New flag to track if player is in range
@@ -31,6 +34,13 @@ public class ObjectiveCollectible : MonoBehaviour
             }
         }
         UpdateObjectiveCounterText(); // Initial update
+
+        // Get or add an AudioSource component
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -80,8 +90,19 @@ public class ObjectiveCollectible : MonoBehaviour
         // Notify GameManager or other systems
         OnObjectiveCollected?.Invoke();
 
-        // Optional: Play a sound effect
-        // if (collectionSound != null) AudioSource.PlayClipAtPoint(collectionSound, transform.position);
+        // Play collection sound
+        if (collectionSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(collectionSound, collectionSoundVolume);
+        }
+        else if (collectionSound == null)
+        {
+            Debug.LogWarning($"Collection sound not assigned for objective: {objectiveName}");
+        }
+        else if (audioSource == null)
+        {
+            Debug.LogWarning($"AudioSource not found for objective: {objectiveName}, cannot play sound.");
+        }
 
         // Optional: Show a particle effect
         // if (collectionEffectPrefab != null) Instantiate(collectionEffectPrefab, transform.position, Quaternion.identity);

@@ -9710,10 +9710,10 @@ MonoBehaviour:
   player: {fileID: 63711976}
   speed: 6
   detectionRadius: 8
-  maxEscapeDistance: 9
-  minFleeSafeDistance: 7
-  pathUpdateInterval: 2
-  fleeDuration: 1
+  maxEscapeDistance: 12
+  minFleeSafeDistance: 10
+  pathUpdateInterval: 3
+  fleeDuration: 2
   aggressiveModeSpeedMultiplier: 1.5
   attackRange: 2
   normalAttackDamage: 10
@@ -9723,6 +9723,7 @@ MonoBehaviour:
   monsterGrowlSound: {fileID: 8300000, guid: be76e9b4d344e5f419d71cbf7925134a, type: 3}
   minGrowlInterval: 3
   maxGrowlInterval: 6
+  maxStunDuration: 10
 --- !u!54 &1602957841
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11372,6 +11373,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackColliderDuration: 0.9
+  stunDuration: 10
 --- !u!1 &1904052926 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1501433250573881312, guid: 998383175bea1704fafb8d9a266f119d, type: 3}

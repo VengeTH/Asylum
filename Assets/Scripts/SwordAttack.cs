@@ -6,6 +6,7 @@ public class SwordAttack : MonoBehaviour
     private Collider swordCollider;
     public float attackColliderDuration = 0.3f; // Duration collider stays enabled during attack
     private Coroutine attackCoroutine;
+    public float stunDuration = 10f; // Default stun duration when hitting an enemy
 
     void Start()
     {
@@ -46,7 +47,7 @@ public class SwordAttack : MonoBehaviour
         if (enemy != null && GameManager.instance != null && GameManager.instance.isTransformed)
         {
             Debug.Log("Enemy hit and stunned: " + other.name);
-            enemy.Stun(10f);
+            enemy.Stun(stunDuration);
         }
     }
 }

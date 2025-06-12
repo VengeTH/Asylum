@@ -1,9 +1,40 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
     public GameObject optionsPopup; // Assign in Inspector
+    public Slider volumeSlider; // Assign in Inspector
+    public TMPro.TextMeshProUGUI volumeValueText; // Assign in Inspector (for showing percentage)
+
+    void Start()
+    {
+        // Initialize volume slider if assigned
+        if (volumeSlider != null)
+        {
+            float savedVolume = PlayerPrefs.GetFloat("GlobalVolume", 1f);
+            volumeSlider.value = savedVolume;
+            AudioListener.volume = savedVolume;
+            volumeSlider.onValueChanged.AddListener(SetVolume);
+            UpdateVolumeText(savedVolume);
+        }
+    }
+
+    public void SetVolume(float value)
+    {
+        AudioListener.volume = value;
+        PlayerPrefs.SetFloat("GlobalVolume", value);
+        PlayerPrefs.Save();
+        UpdateVolumeText(value);
+    }
+
+    private void UpdateVolumeText(float value)
+    {
+        if (volumeValueText != null)
+            volumeValueText.text = Mathf.RoundToInt(value * 100) + "%";
+    }
 
     public void PlayGame()
     {

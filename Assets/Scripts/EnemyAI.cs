@@ -58,6 +58,9 @@ public class EnemyAI : MonoBehaviour
     private AudioSource audioSource;
     private float nextGrowlTime;
 
+    [Header("Stun Settings")]
+    public float maxStunDuration = 40f; // Maximum allowed stun duration
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -432,12 +435,20 @@ public class EnemyAI : MonoBehaviour
 
     public void Stun(float duration)
     {
+        float newStunEndTime = Mathf.Min(Time.time + duration, Time.time + maxStunDuration);
+        if (!isStunned || newStunEndTime > stunEndTime)
+    {
         isStunned = true;
-        stunEndTime = Time.time + duration;
+            stunEndTime = newStunEndTime;
         agent.isStopped = true;
         canAttack = false;
         PlayGetHitAnimation();
-        Debug.Log($"Enemy {gameObject.name} stunned for {duration} seconds.");
+            Debug.Log($"Enemy {gameObject.name} stunned for {duration} seconds. (Max: {maxStunDuration}s)");
+        }
+        else
+        {
+            Debug.Log($"Enemy {gameObject.name} already stunned, not resetting timer.");
+        }
     }
 
     // Removed SetVulnerable as its logic is now handled by the state machine and UpdateStateOnOrbCollection

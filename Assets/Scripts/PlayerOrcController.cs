@@ -83,6 +83,7 @@ public class PlayerOrcController : MonoBehaviour
             if (footstepSound != null && !audioSource.isPlaying)
             {
                 audioSource.clip = footstepSound;
+                audioSource.volume = 2.0f; // Louder footsteps
                 audioSource.Play();
             }
         }

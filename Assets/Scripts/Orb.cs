@@ -19,10 +19,17 @@ public class Orb : MonoBehaviour
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            if (orbManager != null)
+            // Check if player is on the same floor (Y position within 1.0f units)
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
             {
-                orbManager.PlayerHasCollectedOrb();
-                Destroy(gameObject);
+                float floorThreshold = 2.5f;
+                bool isOnSameFloor = Mathf.Abs(transform.position.y - player.transform.position.y) < floorThreshold;
+                if (isOnSameFloor && orbManager != null)
+                {
+                    orbManager.PlayerHasCollectedOrb();
+                    Destroy(gameObject);
+                }
             }
         }
     }

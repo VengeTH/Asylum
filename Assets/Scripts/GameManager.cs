@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour
     public bool isTransformed = false;
     private bool gameWon = false;
 
+    private bool isPaused = false;
+    public GameObject pauseMenuUI; // Assign a pause menu UI panel in the Inspector if you have one
+
     private void Awake()
     {
         if (instance == null)
@@ -301,5 +304,24 @@ public class GameManager : MonoBehaviour
         {
             DeactivateHunterMode();
         }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+    }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+        if (pauseMenuUI != null)
+        {
+            pauseMenuUI.SetActive(isPaused);
+        }
+        // Optionally, unlock/lock cursor or handle audio here
     }
 }

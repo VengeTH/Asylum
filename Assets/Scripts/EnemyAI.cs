@@ -461,15 +461,26 @@ public class EnemyAI : MonoBehaviour
             {
                 if (!isAttacking && agent.velocity.magnitude > 0.1f) // Only growl if moving/pursuing and not attacking
                 {
-                    audioSource.PlayOneShot(monsterGrowlSound);
+                    float maxVolume = 2.0f;
+                    float minVolume = 0.1f;
+                    float maxDistance = 20f;
+                    float distance = Vector3.Distance(transform.position, player.position);
+                    float t = Mathf.Clamp01(1f - (distance / maxDistance));
+                    float growlVolume = Mathf.Lerp(minVolume, maxVolume, t);
+                    audioSource.PlayOneShot(monsterGrowlSound, growlVolume);
                     SetNextGrowlTime();
                 }
                 else if (!isAttacking && agent.velocity.magnitude <= 0.1f && currentState == EnemyState.FollowingPlayer) // Idle growl when following but not moving (e.g. player is close but enemy is stuck or waiting)
                 {
-                    // Potentially a different, more subtle growl or lower chance here
                     if(Random.value < 0.3f) // 30% chance to growl if idle but aware
                     {
-                        audioSource.PlayOneShot(monsterGrowlSound);
+                        float maxVolume = 2.0f;
+                        float minVolume = 0.1f;
+                        float maxDistance = 20f;
+                        float distance = Vector3.Distance(transform.position, player.position);
+                        float t = Mathf.Clamp01(1f - (distance / maxDistance));
+                        float growlVolume = Mathf.Lerp(minVolume, maxVolume, t);
+                        audioSource.PlayOneShot(monsterGrowlSound, growlVolume);
                         SetNextGrowlTime();
                     }
                 }

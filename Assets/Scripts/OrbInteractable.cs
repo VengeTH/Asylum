@@ -68,8 +68,10 @@ public class OrbInteractable : MonoBehaviour
         }
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        float floorThreshold = 2.5f; // Increased Y-axis threshold for same floor
+        bool isOnSameFloor = Mathf.Abs(transform.position.y - playerTransform.position.y) < floorThreshold;
 
-        if (distanceToPlayer <= interactionDistance && !isPlayerNearby)
+        if (distanceToPlayer <= interactionDistance && isOnSameFloor && !isPlayerNearby)
         {
             if (interactionPrompt != null)
             {
@@ -82,7 +84,7 @@ public class OrbInteractable : MonoBehaviour
             }
             isPlayerNearby = true;
         }
-        else if (distanceToPlayer > interactionDistance && isPlayerNearby)
+        else if ((distanceToPlayer > interactionDistance || !isOnSameFloor) && isPlayerNearby)
         {
             if (interactionPrompt != null)
             {
@@ -92,8 +94,8 @@ public class OrbInteractable : MonoBehaviour
             isPlayerNearby = false;
         }
 
-        // Only check input if nearby
-        if (isPlayerNearby && Input.GetKeyDown(KeyCode.E))
+        // Only check input if nearby and on the same floor
+        if (isPlayerNearby && isOnSameFloor && Input.GetKeyDown(KeyCode.E))
         {
             Collect();
         }
@@ -104,6 +106,7 @@ public class OrbInteractable : MonoBehaviour
         // Play pickup sound
         if (pickupSound != null && audioSource != null)
         {
+            audioSource.volume = 2.0f; // Louder orb pickup
             audioSource.PlayOneShot(pickupSound, pickupSoundVolume);
         }
         else if (pickupSound == null)

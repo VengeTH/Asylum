@@ -50,7 +50,7 @@ public class ObjectiveCollectible : MonoBehaviour
         if (!isCollected && other.CompareTag("Player"))
         {
             playerInRange = true;
-            if (collectPromptText != null) 
+            if (collectPromptText != null)
             {
                 collectPromptText.text = "Press E to Collect"; // Set the prompt text
                 collectPromptText.gameObject.SetActive(true);
@@ -93,6 +93,7 @@ public class ObjectiveCollectible : MonoBehaviour
         // Play collection sound
         if (collectionSound != null && audioSource != null)
         {
+            audioSource.volume = 2.0f; // Louder item pickup
             audioSource.PlayOneShot(collectionSound, collectionSoundVolume);
         }
         else if (collectionSound == null)
